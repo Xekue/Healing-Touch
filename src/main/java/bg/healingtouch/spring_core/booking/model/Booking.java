@@ -9,6 +9,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -21,7 +22,6 @@ public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-
 
     //Many bookings can belong to one customer
     @ManyToOne
@@ -64,5 +64,16 @@ public class Booking {
 
     @OneToOne(mappedBy = "booking", cascade = CascadeType.ALL)
     private Review review;
+
+    @Column(nullable = false)
+    private Integer durationMinutes;
+
+    @Column(nullable = false)
+    private BigDecimal price;
+
+    private String cancellationReason;
+
+    @Column
+    private LocalDateTime completedOn;
     
 }
