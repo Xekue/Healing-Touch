@@ -1,5 +1,6 @@
 package bg.healingtouch.spring_core.user.service;
 
+import bg.healingtouch.spring_core.booking.service.BookingService;
 import bg.healingtouch.spring_core.exception.DomainException;
 import bg.healingtouch.spring_core.security.AuthenticationMetadata;
 import bg.healingtouch.spring_core.user.model.User;
@@ -8,7 +9,8 @@ import bg.healingtouch.spring_core.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -19,13 +21,15 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+
+    private static final Logger log = LoggerFactory.getLogger(BookingService.class);
+
 
     @Transactional
     public User register(String username, String email, String password, String firstname, String lastname) {
@@ -73,7 +77,7 @@ public class UserService implements UserDetailsService {
         user.setProfilePicture(profilePicture);
         user.setUpdatedOn(LocalDateTime.now());
 
-        User updated =  userRepository.save(user);
+        User updated = userRepository.save(user);
         log.info("User with id {} updated successfully", updated.getId());
         return updated;
     }
@@ -92,9 +96,9 @@ public class UserService implements UserDetailsService {
     @Transactional
     public void switchRole(UUID userId) {
         User user = getById(userId);
-        if (user.getRole() ==  UserRoles.CUSTOMER) {
+        if (user.getRole() == UserRoles.CUSTOMER) {
             user.setRole(UserRoles.ADMIN);
-        } else  {
+        } else {
             user.setRole(UserRoles.CUSTOMER);
         }
         user.setUpdatedOn(LocalDateTime.now());
@@ -130,5 +134,17 @@ public class UserService implements UserDetailsService {
         return new AuthenticationMetadata(user.getId(), username, user.getPassword(), user.getRole(), user.isActive());
     }
 
+    @Transactional
+    public void promoteToAdmin(UUID userId, UUID performedByAdminId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
+        if (user.getRole() == UserRoles.ADMIN) {
+            throw new IllegalStateException("User is already an admin.");
+        }
+
+        user.setRole(UserRoles.ADMIN);
+        user.setUpdatedOn(LocalDateTime.now());
+        userRepository.save(user);
+    }
 }

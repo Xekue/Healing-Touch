@@ -1,5 +1,6 @@
 package bg.healingtouch.spring_core.therapist.service;
 
+import bg.healingtouch.spring_core.booking.service.BookingService;
 import bg.healingtouch.spring_core.therapist.model.Therapist;
 import bg.healingtouch.spring_core.therapist.repository.TherapistRepository;
 import bg.healingtouch.spring_core.user.model.User;
@@ -9,6 +10,8 @@ import bg.healingtouch.spring_core.web.dto.TherapistResponseDto;
 import bg.healingtouch.spring_core.web.dto.UpdateTherapistDto;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,6 +24,8 @@ public class TherapistService {
 
     private final TherapistRepository therapistRepository;
     private final UserRepository userRepository;
+
+    private static final Logger log = LoggerFactory.getLogger(BookingService.class);
 
     public TherapistResponseDto addTherapist(AddTherapistDto dto) {
         User user = userRepository.findById(dto.getUserId())
@@ -53,6 +58,13 @@ public class TherapistService {
                 .collect(Collectors.toList());
     }
 
+    public List<TherapistResponseDto> findAllActiveTherapists() {
+        return therapistRepository.findAllByIsActiveTrue()
+                .stream()
+                .map(this::mapToResponseDto)
+                .toList();
+    }
+
     public TherapistResponseDto updateTherapist(UUID id, UpdateTherapistDto dto) {
         Therapist therapist = therapistRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Therapist not found"));
@@ -70,7 +82,7 @@ public class TherapistService {
         return mapToResponseDto(therapist);
     }
 
-    // DELETE
+    // DELETE!
     public void deleteTherapist(UUID id) {
         if (!therapistRepository.existsById(id)) {
             throw new EntityNotFoundException("Therapist not found");
@@ -78,7 +90,7 @@ public class TherapistService {
         therapistRepository.deleteById(id);
     }
 
-    // TOGGLE ACTIVE
+    // TOGGLE ACTIVE!
     public TherapistResponseDto toggleActiveStatus(UUID id) {
         Therapist therapist = therapistRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Therapist not found"));
@@ -90,7 +102,7 @@ public class TherapistService {
     }
 
 
-    // HELPER
+    // HELPER!
     private TherapistResponseDto mapToResponseDto(Therapist therapist) {
         TherapistResponseDto dto = new TherapistResponseDto();
         dto.setId(therapist.getId());
