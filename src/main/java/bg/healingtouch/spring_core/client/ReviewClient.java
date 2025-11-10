@@ -8,15 +8,15 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
-@FeignClient(name = "review-service", url = "http://localhost:8081/api/reviews")
+@FeignClient(name = "review-service", url = "http://localhost:8081", path = "/api/reviews")
 public interface ReviewClient {
 
     @PostMapping
     ReviewResponseDto createReview(@RequestBody CreateReviewDto dto);
 
-    @GetMapping("/therapist/{id}")
-    List<ReviewResponseDto> getReviewsForTherapist(@PathVariable("id") UUID therapistId);
+    @GetMapping("/therapist/{therapistId}")
+    List<ReviewResponseDto> getReviewsForTherapist(@PathVariable UUID therapistId);
 
     @DeleteMapping("/{id}")
-    void deleteReview(@PathVariable("id") UUID reviewId);
+    void deleteReview(@PathVariable UUID id);
 }

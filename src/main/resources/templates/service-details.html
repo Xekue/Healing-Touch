@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${service.name()} + ' Massage | Healing Touch'">Massage Details</title>
+
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="icon" th:href="@{/images/logo.png}">
+    <style>
+        body {
+            font-family: "Poppins", sans-serif;
+            background-color: #faf9f8;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        header, footer {
+            text-align: center;
+            padding: 1rem;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        main {
+            max-width: 900px;
+            margin: 3rem auto;
+            background: #fff;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .service-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .service-header img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        h1 {
+            font-size: 2rem;
+            color: #2b6e63;
+            margin: 0;
+        }
+
+        .details {
+            margin-top: 1.5rem;
+            line-height: 1.7;
+        }
+
+        .who-for {
+            background-color: #e7f5f0;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-top: 2rem;
+        }
+
+        .who-for h3 {
+            margin-top: 0;
+            color: #1f4f46;
+        }
+
+        .info-section {
+            margin-top: 2rem;
+        }
+
+        .book-btn {
+            display: inline-block;
+            background-color: #2b6e63;
+            color: #fff;
+            text-decoration: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            margin-top: 2rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .book-btn:hover {
+            background-color: #245b52;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 1rem;
+            color: #2b6e63;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            main {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+            h1 {
+                font-size: 1.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a th:href="@{/}" style="text-decoration:none; color:#2b6e63;">
+        <h2>Healing Touch</h2>
+    </a>
+</header>
+
+<main>
+    <div class="service-header">
+        <h1 th:text="${service.name()} + ' Massage'"></h1>
+    </div>
+
+    <div class="details">
+        <p th:switch="${service.name()}">
+            <span th:case="'CLASSIC'">
+                Our Classic Massage uses long, flowing strokes to release muscle tension, improve circulation, and promote deep relaxation throughout the entire body.
+                It’s the perfect foundation for anyone seeking calm and balance.
+            </span>
+            <span th:case="'RELAX'">
+                A gentle, full-body massage designed to calm your mind, ease stress, and restore inner peace.
+                Soft movements and warm oils help your brain slow down and your body fully unwind.
+            </span>
+            <span th:case="'ANTICELLULITE_LEGS'">
+                A targeted massage for the legs that stimulates circulation, breaks down fat deposits, and reduces cellulite appearance.
+                Expect firmer, smoother, and more toned skin after several sessions.
+            </span>
+            <span th:case="'ANTICELLULITE_BACK'">
+                This massage combines anti-cellulite work on the legs with a relaxing back treatment.
+                It’s the perfect combination of intensity and comfort — firm leg work followed by soothing back care.
+            </span>
+            <span th:case="'SPORTS'">
+                Designed for active individuals, this massage blends deep tissue pressure and stretching to relieve muscle fatigue, prevent injuries, and improve flexibility.
+                It’s ideal before or after training sessions.
+            </span>
+            <span th:case="'HEALING'">
+                A highly focused massage where the therapist uses experience and intuition to locate tension points, restore energy flow, and relieve chronic discomfort.
+                Every movement is intentional and personalized for healing.
+            </span>
+            <span th:case="'DEEP_TISSUE'">
+                Deep, deliberate pressure targets the deeper layers of muscle and fascia to relieve long-term tension.
+                It’s perfect for athletes or anyone who enjoys strong massages that bring real physical release.
+            </span>
+            <span th:case="'AROMA'">
+                A calming massage using oils infused with lavender, chamomile, and citrus.
+                The natural aromas and gentle techniques soothe the body, slow the mind, and awaken the senses for total harmony.
+            </span>
+            <span th:case="'THAI'">
+                The Thai Massage blends assisted yoga-like stretches, acupressure, and rhythmic compressions.
+                It enhances flexibility, stimulates blood flow, and energizes the body — leaving you both calm and recharged.
+            </span>
+            <span th:case="*">
+                Experience a rejuvenating massage tailored to your body’s needs.
+            </span>
+        </p>
+    </div>
+
+    <div class="who-for">
+        <h3>Who is this massage for?</h3>
+        <p th:switch="${service.name()}">
+            <span th:case="'CLASSIC'">
+                Perfect for individuals seeking relaxation and stress prevention — great if you want to unwind after a long week or maintain balance in your body.
+            </span>
+            <span th:case="'RELAX'">
+                Ideal for people who feel mentally overloaded, spend long hours at work, or simply need to pause and breathe.
+            </span>
+            <span th:case="'ANTICELLULITE_LEGS'">
+                Designed for women who wish to tone and smooth their legs while targeting cellulite through deep stimulation.
+            </span>
+            <span th:case="'ANTICELLULITE_BACK'">
+                Best for clients who want both targeted anti-cellulite care and deep back relaxation in one session.
+            </span>
+            <span th:case="'SPORTS'">
+                Great for athletes, gym-goers, or anyone leading an active lifestyle and seeking improved recovery and mobility.
+            </span>
+            <span th:case="'HEALING'">
+                Recommended for those suffering from chronic pain or tension — especially if you value a personalized, problem-solving approach.
+            </span>
+            <span th:case="'DEEP_TISSUE'">
+                For athletes and those who prefer strong massages that deeply relax and restore muscle function.
+            </span>
+            <span th:case="'AROMA'">
+                For anyone craving emotional peace, sensory comfort, and relaxation through soothing scents and gentle touch.
+            </span>
+            <span th:case="'THAI'">
+                Ideal for people who love movement, stretching, and energy-focused treatments that restore flexibility and vitality.
+            </span>
+            <span th:case="*">
+                Suitable for anyone looking to relax, recharge, and reconnect with their body.
+            </span>
+        </p>
+    </div>
+
+    <div class="info-section">
+        <p><strong>Duration:</strong> <span th:text="${service.durationMinutes}"></span> minutes</p>
+        <p><strong>Price:</strong> €<span th:text="${service.basePrice}"></span></p>
+    </div>
+
+    <a th:href="@{/bookings}" class="book-btn">Book Now</a>
+    <br>
+    <a th:href="@{/services}" class="back-link">← Back to Services</a>
+</main>
+
+<footer>
+    <p>&copy; 2025 Healing Touch. All rights reserved.</p>
+</footer>
+
+</body>
+</html>

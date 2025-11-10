@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head></head>
+<body>
+  <!-- Footer Fragment -->
+  <footer th:fragment="footer" class="mt-5" style="background: linear-gradient(135deg, #2d5016 0%, #4a7c59 100%); color: #faf5e6; padding: 2rem 0;">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <h5 style="color: #f5f5dc; font-weight: 600;">
+            <i class="fas fa-spa me-2"></i>Healing Touch
+          </h5>
+          <p style="color: #faf5e6; font-size: 0.9rem;">
+            Professional mobile massage therapy services. Bringing wellness to your door.
+          </p>
+        </div>
+        <div class="col-md-4 mb-3">
+          <h5 style="color: #f5f5dc; font-weight: 600;">Quick Links</h5>
+          <ul class="list-unstyled">
+            <li><a th:href="@{/}" style="color: #faf5e6; text-decoration: none;">Home</a></li>
+            <li><a th:href="@{/therapists}" style="color: #faf5e6; text-decoration: none;">Therapists</a></li>
+            <li><a th:href="@{/services}" style="color: #faf5e6; text-decoration: none;">Services</a></li>
+            <li><a th:href="@{/bookings}" style="color: #faf5e6; text-decoration: none;">Book Appointment</a></li>
+          </ul>
+        </div>
+        <div class="col-md-4 mb-3">
+          <h5 style="color: #f5f5dc; font-weight: 600;">Contact</h5>
+          <p style="color: #faf5e6; font-size: 0.9rem; margin-bottom: 0.5rem;">
+            <i class="fas fa-phone me-2"></i>+359 88 228 8221
+          </p>
+          <p style="color: #faf5e6; font-size: 0.9rem; margin-bottom: 0.5rem;">
+            <i class="fas fa-map-marker-alt me-2"></i>Ruse, Bulgaria
+          </p>
+          <p style="color: #faf5e6; font-size: 0.9rem;">
+            <i class="fas fa-clock me-2"></i>9AM - 9PM Daily
+          </p>
+        </div>
+      </div>
+      <hr style="border-color: rgba(245, 245, 220, 0.3); margin: 1.5rem 0;">
+      <div class="text-center">
+        <p style="color: #f5f5dc; font-size: 0.85rem; margin: 0;">
+          &copy; <span th:text="${#dates.year(#dates.createNow())}">2024</span> Healing Touch. All rights reserved.
+        </p>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
+
+

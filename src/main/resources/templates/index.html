@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Healing Touch | Home - Professional Massage Therapy</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --spa-green: #4a7c59;
+            --spa-green-dark: #2d5016;
+            --spa-beige: #f5f5dc;
+            --spa-cream: #faf5e6;
+            --spa-cream-light: #fffef7;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--spa-cream-light) 0%, var(--spa-cream) 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, rgba(74, 124, 89, 0.1) 0%, rgba(245, 245, 220, 0.3) 100%);
+            padding: 4rem 0;
+            margin-top: 2rem;
+        }
+        
+        .hero-title {
+            color: var(--spa-green-dark);
+            font-weight: 700;
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .hero-subtitle {
+            color: var(--spa-green);
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+        }
+        
+        .feature-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            height: 100%;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(74, 124, 89, 0.2);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(74, 124, 89, 0.2);
+        }
+        
+        .feature-icon {
+            color: var(--spa-green);
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .feature-card h4 {
+            color: var(--spa-green-dark);
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .feature-card p {
+            color: #555;
+            line-height: 1.6;
+        }
+        
+        .cta-button {
+            background: linear-gradient(135deg, var(--spa-green) 0%, var(--spa-green-dark) 100%);
+            color: white;
+            padding: 0.75rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: inline-block;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 124, 89, 0.3);
+            color: white;
+        }
+        
+        .section-title {
+            color: var(--spa-green-dark);
+            font-weight: 700;
+            margin-bottom: 3rem;
+            text-align: center;
+        }
+        
+        .intro-section {
+            background: white;
+            border-radius: 15px;
+            padding: 3rem;
+            margin: 3rem 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .intro-section h2 {
+            color: var(--spa-green-dark);
+            margin-bottom: 1.5rem;
+        }
+        
+        .intro-section p {
+            color: #555;
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+
+    <!-- Logout Success Message -->
+    <div th:if="${param.logout}" class="alert alert-success text-center mt-3 container" role="alert">
+        <i class="fas fa-check-circle me-2"></i>
+        You have been logged out successfully.
+    </div>
+    
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 text-center text-lg-start mb-4 mb-lg-0">
+                    <h1 class="hero-title">
+                        <i class="fas fa-spa me-2"></i>Healing Touch
+                    </h1>
+                    <p class="hero-subtitle">
+                        Professional Mobile Massage Therapy in Ruse, Bulgaria
+                    </p>
+                    <p class="lead" style="color: #555; margin-bottom: 2rem;">
+                        Experience the tranquility of professional massage therapy in the comfort of your own home, office, or hotel. We bring wellness to you.
+                    </p>
+                    <a th:href="@{/therapists}" class="cta-button">
+                        <i class="fas fa-calendar-check me-2"></i>Book Your Session
+                    </a>
+                </div>
+                <div class="col-lg-6 text-center">
+                    <i class="fas fa-spa" style="font-size: 15rem; color: var(--spa-green); opacity: 0.3;"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Features Section -->
+    <section class="py-5">
+        <div class="container">
+            <h2 class="section-title">Why Choose Healing Touch?</h2>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="text-center">
+                            <i class="fas fa-home feature-icon"></i>
+                            <h4>Mobile Service</h4>
+                            <p>We come to you! Whether it's your home, office, or hotel, we bring our professional service directly to your location.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="text-center">
+                            <i class="fas fa-user-md feature-icon"></i>
+                            <h4>Certified Therapists</h4>
+                            <p>Our experienced and certified therapists are dedicated to providing you with the highest quality massage therapy.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="text-center">
+                            <i class="fas fa-clock feature-icon"></i>
+                            <h4>Flexible Hours</h4>
+                            <p>Available from 9AM to 9PM daily. Book a session that fits perfectly into your schedule.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Introduction Section -->
+    <section class="py-5">
+        <div class="container">
+            <div class="intro-section">
+                <h2 class="text-center">
+                    <i class="fas fa-leaf me-2" style="color: var(--spa-green);"></i>
+                    Welcome to Healing Touch
+                </h2>
+                <p>
+                    At Healing Touch, we believe that wellness should be accessible and convenient. Our mobile massage therapy services bring the spa experience directly to you, eliminating the need to travel and allowing you to relax in your own familiar environment.
+                </p>
+                <p>
+                    We specialize in a variety of massage techniques including Swedish massage, deep tissue therapy, and aromatherapy. Each session is tailored to your specific needs, ensuring you receive the maximum therapeutic benefits and complete relaxation.
+                </p>
+                <p class="text-center mt-4">
+                    <a th:href="@{/therapists}" class="cta-button">
+                        <i class="fas fa-user-md me-2"></i>Meet Our Therapists
+                    </a>
+                </p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

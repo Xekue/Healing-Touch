@@ -6,8 +6,11 @@ import bg.healingtouch.spring_core.security.AuthenticationMetadata;
 import bg.healingtouch.spring_core.user.model.User;
 import bg.healingtouch.spring_core.user.model.UserRoles;
 import bg.healingtouch.spring_core.user.repository.UserRepository;
+import bg.healingtouch.spring_core.web.dto.RegisterDto;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,26 +35,23 @@ public class UserService implements UserDetailsService {
 
 
     @Transactional
-    public User register(String username, String email, String password, String firstname, String lastname) {
-
-        if (userRepository.existsByEmail(email)) {
-            throw new IllegalArgumentException("Email already registered: " + email);
+    public User register(RegisterDto dto) {
+        if (userRepository.existsByEmail(dto.getEmail())) {
+            throw new IllegalArgumentException("Email already registered: " + dto.getEmail());
         }
 
         User user = new User();
-        user.setUsername(username);
-        user.setEmail(email);
-        user.setPassword(passwordEncoder.encode(password));
-        user.setFirstname(firstname);
-        user.setLastname(lastname);
+        user.setUsername(dto.getUsername());
+        user.setEmail(dto.getEmail());
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
+        user.setFirstName(dto.getFirstName());
+        user.setLastName(dto.getLastName());
         user.setRole(UserRoles.CUSTOMER);
         user.setActive(true);
         user.setCreatedOn(LocalDateTime.now());
         user.setUpdatedOn(LocalDateTime.now());
 
-        User savedUser = userRepository.save(user);
-        log.info("User with email {} registered successfully", user.getEmail());
-        return savedUser;
+        return userRepository.save(user);
     }
 
     public User getById(UUID userId) {
@@ -72,8 +72,8 @@ public class UserService implements UserDetailsService {
     public User updateProfile(UUID userId, String firstName, String lastName, String profilePicture) {
         User user = getById(userId);
 
-        user.setFirstname(firstName);
-        user.setLastname(lastName);
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
         user.setProfilePicture(profilePicture);
         user.setUpdatedOn(LocalDateTime.now());
 
@@ -122,10 +122,6 @@ public class UserService implements UserDetailsService {
         log.info("Password changed for user ID: {}", userId);
     }
 
-    // Всеки пък, когато потребител се логва, Spring Security ще извиква този метод
-    // за да вземе детайлите на потребителя с този username
-    // Test 1: When user exist - then return new AuthenticationMetadata
-    // Test 2: When User does not exist - then throws exception
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
@@ -146,5 +142,13 @@ public class UserService implements UserDetailsService {
         user.setRole(UserRoles.ADMIN);
         user.setUpdatedOn(LocalDateTime.now());
         userRepository.save(user);
+    }
+
+    public boolean existsByUsername(String username) {
+        return userRepository.existsByUsername(username);
+    }
+
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
     }
 }

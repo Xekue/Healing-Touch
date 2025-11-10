@@ -9,11 +9,9 @@ import java.util.UUID;
 
 public interface TherapistRepository extends JpaRepository<Therapist, UUID> {
 
-    List<Therapist> findByActiveTrue();
-
     Optional<Therapist> findByUserId(UUID userId);
 
-    List<Therapist> findAllByIsActiveTrue();
+    List<Therapist> findAllByActiveTrue();
 
     Optional<Therapist> findByUserUsername(String username);
 }

@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Create a new HealingTouch account to start booking massage therapy sessions.">
+    <title>Register | HealingTouch</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+    
+    <style>
+        :root {
+            --spa-green: #6b8e6b;
+            --spa-green-dark: #4a7c59;
+            --spa-beige: #f5f5dc;
+            --spa-cream: #faf5e6;
+            --spa-sand: #d4c5a0;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--spa-cream) 0%, var(--spa-beige) 50%, #fff8e7 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        main {
+            flex: 1;
+            padding: 3rem 1rem;
+        }
+        
+        .register-card {
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            border: 1px solid rgba(107, 142, 107, 0.2);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .register-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .register-title {
+            color: var(--spa-green-dark);
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .register-subtitle {
+            color: #666;
+            font-size: 1rem;
+        }
+        
+        .form-label {
+            color: var(--spa-green-dark);
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+        
+        .form-control {
+            border: 2px solid rgba(107, 142, 107, 0.2);
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: var(--spa-green);
+            box-shadow: 0 0 0 0.2rem rgba(107, 142, 107, 0.25);
+        }
+        
+        .form-control.is-invalid {
+            border-color: #dc3545;
+        }
+        
+        .invalid-feedback {
+            display: block;
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+        
+        .btn-register {
+            background: linear-gradient(135deg, var(--spa-green) 0%, var(--spa-green-dark) 100%);
+            color: white;
+            padding: 0.75rem 2rem;
+            border-radius: 50px;
+            border: none;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            width: 100%;
+            box-shadow: 0 4px 15px rgba(107, 142, 107, 0.3);
+        }
+        
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(107, 142, 107, 0.4);
+            color: white;
+        }
+        
+        .login-link {
+            text-align: center;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(107, 142, 107, 0.2);
+        }
+        
+        .login-link a {
+            color: var(--spa-green-dark);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .login-link a:hover {
+            color: var(--spa-green);
+            text-decoration: underline;
+        }
+        
+        .alert {
+            border-radius: 10px;
+            border: none;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div th:replace="~{fragments/header :: header}"></div>
+    
+    <main>
+        <div class="register-card">
+            <div class="register-header">
+                <h1 class="register-title">
+                    <i class="fas fa-user-plus me-2"></i>Create Account
+                </h1>
+                <p class="register-subtitle">Join HealingTouch and start your wellness journey today.</p>
+            </div>
+
+            <!-- Success Message -->
+            <div class="alert alert-success alert-dismissible fade show" role="alert"
+                 th:if="${successMessage}">
+                <i class="fas fa-check-circle me-2"></i>
+                <span th:text="${successMessage}">Registration successful!</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
+            <!-- Error Message -->
+            <div class="alert alert-danger alert-dismissible fade show" role="alert"
+                 th:if="${errorMessage}">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                <span th:text="${errorMessage}">Something went wrong.</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            
+            <!-- Registration Form -->
+            <form th:action="@{/register}" th:object="${registerRequest}" method="post">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="firstName" class="form-label">
+                            <i class="fas fa-user me-2"></i>First Name
+                        </label>
+                        <input type="text" class="form-control" id="firstName" th:field="*{firstName}"
+                               placeholder="Enter your first name" required>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}">
+                            Error message
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label for="lastName" class="form-label">
+                            <i class="fas fa-user me-2"></i>Last Name
+                        </label>
+                        <input type="text" class="form-control" id="lastName" th:field="*{lastName}"
+                               placeholder="Enter your last name" required>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}">
+                            Error message
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="username" class="form-label">
+                        <i class="fas fa-at me-2"></i>Username
+                    </label>
+                    <input type="text" class="form-control" id="username" th:field="*{username}"
+                           placeholder="Choose a username" required>
+                    <div class="invalid-feedback" th:if="${#fields.hasErrors('username')}" th:errors="*{username}">
+                        Error message
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="email" class="form-label">
+                        <i class="fas fa-envelope me-2"></i>Email
+                    </label>
+                    <input type="email" class="form-control" id="email" th:field="*{email}"
+                           placeholder="Enter your email address" 
+                           pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" required>
+                    <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">
+                        Error message
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="password" class="form-label">
+                        <i class="fas fa-lock me-2"></i>Password
+                    </label>
+                    <input type="password" class="form-control" id="password" th:field="*{password}"
+                           placeholder="Create a password" required minlength="6">
+                    <div class="invalid-feedback" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">
+                        Error message
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label for="confirmPassword" class="form-label">
+                        <i class="fas fa-lock me-2"></i>Confirm Password
+                    </label>
+                    <input type="password" class="form-control" id="confirmPassword" 
+                           name="confirmPassword" placeholder="Confirm your password" required minlength="6">
+                </div>
+                
+                <button type="submit" class="btn-register">
+                    <i class="fas fa-user-plus me-2"></i>Create Account
+                </button>
+            </form>
+            
+            <div class="login-link">
+                <p style="color: #666; margin-bottom: 0.5rem;">Already have an account?</p>
+                <a th:href="@{/login}">
+                    <i class="fas fa-sign-in-alt me-2"></i>Sign in here
+                </a>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Password Confirmation Validation -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const password = document.getElementById('password');
+            const confirmPassword = document.getElementById('confirmPassword');
+            
+            function validatePasswordMatch() {
+                if (confirmPassword.value !== password.value) {
+                    confirmPassword.setCustomValidity('Passwords do not match');
+                } else {
+                    confirmPassword.setCustomValidity('');
+                }
+            }
+            
+            password.addEventListener('input', validatePasswordMatch);
+            confirmPassword.addEventListener('input', validatePasswordMatch);
+        });
+    </script>
+</body>
+</html>
+

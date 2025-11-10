@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="HealingTouch - Professional massage therapy booking platform. Relax, heal, and reconnect with our certified therapists.">
+    <title>HealingTouch | Relax. Heal. Reconnect.</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- AOS (Animate On Scroll) CSS -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+    
+    <style>
+        :root {
+            --spa-green: #6b8e6b;
+            --spa-green-dark: #4a7c59;
+            --spa-beige: #f5f5dc;
+            --spa-cream: #faf5e6;
+            --spa-sand: #d4c5a0;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--spa-cream) 0%, var(--spa-beige) 50%, #fff8e7 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        main {
+            flex: 1;
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, rgba(107, 142, 107, 0.15) 0%, rgba(245, 245, 220, 0.25) 100%),
+                        url('/images/hero-background.jpg') center/cover no-repeat;
+            min-height: 70vh;
+            display: flex;
+            align-items: center;
+            padding: 4rem 0;
+            position: relative;
+        }
+        
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(250, 245, 230, 0.7);
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .hero-tagline {
+            color: var(--spa-green-dark);
+            font-weight: 300;
+            font-size: 3.5rem;
+            letter-spacing: 2px;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        
+        .hero-tagline span {
+            display: block;
+            font-weight: 400;
+        }
+        
+        .hero-description {
+            color: #555;
+            font-size: 1.2rem;
+            line-height: 1.8;
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto 2.5rem;
+        }
+        
+        .mission-section {
+            background: white;
+            padding: 4rem 0;
+        }
+        
+        .mission-text {
+            color: #555;
+            font-size: 1.1rem;
+            line-height: 1.9;
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        
+        .cta-primary {
+            background: linear-gradient(135deg, var(--spa-green) 0%, var(--spa-green-dark) 100%);
+            color: white;
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(107, 142, 107, 0.3);
+        }
+        
+        .cta-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 25px rgba(107, 142, 107, 0.4);
+            color: white;
+        }
+        
+        .cta-container {
+            text-align: center;
+        }
+        
+        @media (max-width: 768px) {
+            .hero-tagline {
+                font-size: 2.5rem;
+            }
+            
+            .hero-description {
+                font-size: 1rem;
+                padding: 0 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div th:replace="~{fragments/header :: header}"></div>
+    
+    <main>
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="hero-content">
+                            <h1 class="hero-tagline" data-aos="fade-up" data-aos-duration="1200" data-aos-easing="ease-out-cubic">
+                                <span data-aos="fade-up" data-aos-delay="100" data-aos-duration="1000">Relax.</span>
+                                <span data-aos="fade-up" data-aos-delay="200" data-aos-duration="1000">Heal.</span>
+                                <span data-aos="fade-up" data-aos-delay="300" data-aos-duration="1000">Reconnect.</span>
+                            </h1>
+                            <p class="hero-description" data-aos="fade-up" data-aos-delay="400" data-aos-duration="1000" data-aos-easing="ease-out-cubic">
+                                Welcome to HealingTouch, where professional massage therapy meets the comfort of your space. 
+                                Our mission is to bring tranquility, healing, and wellness directly to you through our experienced 
+                                certified therapists.
+                            </p>
+                            <div class="cta-container" data-aos="fade-up" data-aos-delay="600" data-aos-duration="1000" data-aos-easing="ease-out-cubic">
+                                <a th:href="@{/therapists}" class="cta-primary">
+                                    <i class="fas fa-spa me-2"></i>Book a Massage
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Mission Section -->
+        <section class="mission-section">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <h2 class="text-center mb-4" style="color: var(--spa-green-dark); font-weight: 600;">
+                            Our Mission
+                        </h2>
+                        <p class="mission-text">
+                            At HealingTouch, we believe that wellness should be accessible, convenient, and personalized. 
+                            We connect you with skilled massage therapists who bring the spa experience to your home, office, or hotel. 
+                            Whether you need relaxation, pain relief, or stress management, our platform makes it easy to find and 
+                            book the perfect therapist for your needs. Experience the healing power of touch, tailored to your schedule 
+                            and preferences.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <!-- Footer -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- AOS (Animate On Scroll) JS -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({
+            duration: 1000,
+            easing: 'ease-out-cubic',
+            once: true,
+            offset: 50,
+            delay: 0,
+            disable: 'mobile'
+        });
+    </script>
+</body>
+</html>
+

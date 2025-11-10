@@ -1,5 +1,6 @@
 package bg.healingtouch.spring_core.web.dto;
 
+import bg.healingtouch.spring_core.user.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,4 +26,5 @@ public class TherapistResponseDto {
     private BigDecimal hourlyRate;
     private String profilePicture;
 
+    private User user;
 }

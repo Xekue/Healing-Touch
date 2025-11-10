@@ -23,8 +23,8 @@ public class RegisterDto {
     private String password;
 
     @NotBlank(message = "First name is required")
-    private String firstname;
+    private String firstName;
 
     @NotBlank(message = "Last name is required")
-    private String lastname;
+    private String lastName;
 }

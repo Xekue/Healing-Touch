@@ -18,7 +18,7 @@ public class BookingCleanupService {
 
     @Scheduled(cron = "0 0 * * * *")
     public void cancelStaleBookings() {
-        LocalDateTime cutoff =  LocalDateTime.now().minusDays(24);
+        LocalDateTime cutoff =  LocalDateTime.now().minusHours(24);
         bookingRepository.findAll().stream()
                 .filter(b -> b.getBookingStatus() == BookingStatus.PENDING && b.getStartTime().isBefore(cutoff))
                 .forEach(b -> b.setBookingStatus(BookingStatus.CANCELLED));

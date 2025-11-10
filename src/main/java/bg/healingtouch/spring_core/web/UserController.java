@@ -33,14 +33,7 @@ public class UserController {
 
     @PostMapping("/register")
     public ResponseEntity<User> register(@Valid @RequestBody RegisterDto dto) {
-        User created = userService.register(
-                dto.getUsername(),
-                dto.getEmail(),
-                dto.getPassword(),
-                dto.getFirstname(),
-                dto.getLastname()
-        );
-
+        User created = userService.register(dto);
         return ResponseEntity.ok(created);
     }
 

@@ -1,6 +1,5 @@
-package bg.healingtouch.spring_core.web;
+package bg.healingtouch.spring_core.web.api;
 
-import bg.healingtouch.spring_core.therapist.model.Therapist;
 import bg.healingtouch.spring_core.therapist.service.TherapistService;
 import bg.healingtouch.spring_core.web.dto.AddTherapistDto;
 import bg.healingtouch.spring_core.web.dto.TherapistResponseDto;
@@ -16,7 +15,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/therapists")
 @RequiredArgsConstructor
-public class TherapistController {
+public class TherapistApiController {
 
     private final TherapistService therapistService;
 

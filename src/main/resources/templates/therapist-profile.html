@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${therapist != null ? therapist.firstName + ' ' + therapist.lastName + ' | Healing Touch' : 'Therapist Profile | Healing Touch'}">
+        Therapist Profile | Healing Touch
+    </title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --spa-green: #4a7c59;
+            --spa-green-dark: #2d5016;
+            --spa-beige: #f5f5dc;
+            --spa-cream: #faf5e6;
+            --spa-cream-light: #fffef7;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--spa-cream-light) 0%, var(--spa-cream) 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding-bottom: 2rem;
+        }
+        
+        .profile-header {
+            background: linear-gradient(135deg, rgba(74, 124, 89, 0.1) 0%, rgba(245, 245, 220, 0.3) 100%);
+            padding: 3rem 0;
+            margin-bottom: 3rem;
+        }
+        
+        .profile-image {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid var(--spa-green);
+            margin: 0 auto;
+            display: block;
+            box-shadow: 0 8px 20px rgba(74, 124, 89, 0.3);
+        }
+        
+        .profile-name {
+            color: var(--spa-green-dark);
+            font-weight: 700;
+            font-size: 2.5rem;
+            margin-top: 1.5rem;
+            text-align: center;
+        }
+        
+        .profile-title {
+            color: var(--spa-green);
+            font-size: 1.2rem;
+            text-align: center;
+            font-style: italic;
+            margin-bottom: 1rem;
+        }
+        
+        .profile-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(74, 124, 89, 0.2);
+        }
+        
+        .section-title {
+            color: var(--spa-green-dark);
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--spa-green);
+        }
+        
+        .info-item {
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background: var(--spa-cream);
+            border-radius: 8px;
+        }
+        
+        .info-label {
+            color: var(--spa-green-dark);
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .info-value {
+            color: #555;
+        }
+        
+        .specialty-badge {
+            background: var(--spa-beige);
+            color: var(--spa-green-dark);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin: 0.25rem;
+            display: inline-block;
+            border: 1px solid rgba(74, 124, 89, 0.3);
+        }
+        
+        .review-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid var(--spa-green);
+        }
+        
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .reviewer-name {
+            color: var(--spa-green-dark);
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .review-date {
+            color: #888;
+            font-size: 0.85rem;
+        }
+        
+        .review-rating {
+            color: #ffc107;
+            margin-bottom: 0.5rem;
+        }
+        
+        .review-text {
+            color: #555;
+            line-height: 1.6;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-box {
+            background: linear-gradient(135deg, var(--spa-green) 0%, var(--spa-green-dark) 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .book-btn {
+            background: linear-gradient(135deg, var(--spa-green) 0%, var(--spa-green-dark) 100%);
+            color: white;
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: inline-block;
+        }
+        
+        .book-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 124, 89, 0.3);
+            color: white;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #666;
+        }
+        
+        .empty-state i {
+            font-size: 5rem;
+            color: var(--spa-green);
+            opacity: 0.5;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+    
+    <!-- Profile Header -->
+    <section class="profile-header" th:if="${therapist != null}">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8 offset-md-2 text-center">
+                    <img th:src="${therapist.imageUrl != null ? therapist.imageUrl : '/images/default-therapist.jpg'}" 
+                         th:alt="${'Photo of ' + therapist.firstName + ' ' + therapist.lastName}"
+                         class="profile-image">
+                    
+                    <h1 class="profile-name" th:text="${therapist.firstName + ' ' + therapist.lastName}">
+                        Therapist Name
+                    </h1>
+                    
+                    <p class="profile-title" th:text="${therapist.title}">
+                        Certified Massage Therapist
+                    </p>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-box">
+                            <div class="stat-value" th:text="${therapist.experienceYears}">5</div>
+                            <div class="stat-label">Years Experience</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value" th:text="${therapist.rating != null ? #numbers.formatDecimal(therapist.rating, 1, 1) : 'N/A'}">4.8</div>
+                            <div class="stat-label">Average Rating</div>
+                        </div>
+                        <div class="stat-box" th:if="${therapist.totalSessions != null}">
+                            <div class="stat-value" th:text="${therapist.totalSessions}">500+</div>
+                            <div class="stat-label">Total Sessions</div>
+                        </div>
+                        <div class="stat-box" th:if="${therapist.totalReviews != null}">
+                            <div class="stat-value" th:text="${therapist.totalReviews}">120</div>
+                            <div class="stat-label">Reviews</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Profile Content -->
+    <section class="container" th:if="${therapist != null}">
+        <div class="row">
+            <!-- About Section -->
+            <div class="col-lg-8">
+                <div class="profile-card">
+                    <h2 class="section-title">
+                        <i class="fas fa-user me-2"></i>About
+                    </h2>
+                    <p class="info-value" th:text="${therapist.bio != null ? therapist.bio : 'Professional massage therapist dedicated to providing exceptional wellness services.'}" style="line-height: 1.8; color: #555;">
+                        Professional massage therapist with extensive experience...
+                    </p>
+                </div>
+                
+                <!-- Specialties Section -->
+                <div class="profile-card" th:if="${therapist.specialties != null and !therapist.specialties.isEmpty()}">
+                    <h2 class="section-title">
+                        <i class="fas fa-star me-2"></i>Specialties
+                    </h2>
+                    <div>
+                        <span class="specialty-badge" th:each="specialty : ${therapist.specialties}" th:text="${specialty}">
+                            Specialty
+                        </span>
+                    </div>
+                </div>
+                
+                <!-- Certifications Section -->
+                <div class="profile-card" th:if="${therapist.certifications != null and !therapist.certifications.isEmpty()}">
+                    <h2 class="section-title">
+                        <i class="fas fa-certificate me-2"></i>Certifications
+                    </h2>
+                    <div class="info-item" th:each="certification : ${therapist.certifications}">
+                        <div class="info-label" th:text="${certification.name}">Certification Name</div>
+                        <div class="info-value" th:text="${certification.issuer + ' - ' + certification.year}">Issuer - Year</div>
+                    </div>
+                </div>
+                
+                <!-- Reviews Section -->
+                <div class="profile-card">
+                    <h2 class="section-title">
+                        <i class="fas fa-comments me-2"></i>Client Reviews
+                        <span class="badge bg-secondary ms-2" th:text="${reviews != null ? reviews.size() : 0}">0</span>
+                    </h2>
+                    
+                    <div th:if="${reviews != null and !reviews.isEmpty()}">
+                        <div class="review-card" th:each="review : ${reviews}">
+                            <div class="review-header">
+                                <div>
+                                    <div class="reviewer-name" th:text="${review.reviewerName != null ? review.reviewerName : 'Anonymous'}">
+                                        Reviewer Name
+                                    </div>
+                                    <div class="review-rating">
+                                        <i class="fas fa-star" th:each="i : ${#numbers.sequence(1, review.rating)}"></i>
+                                        <i class="far fa-star" th:each="i : ${#numbers.sequence(review.rating + 1, 5)}"></i>
+                                        <span class="ms-2" th:text="${review.rating}">5</span>
+                                    </div>
+                                </div>
+                                <div class="review-date" th:text="${#temporals.format(review.reviewDate, 'MMM dd, yyyy')}">
+                                    Date
+                                </div>
+                            </div>
+                            <p class="review-text" th:text="${review.comment}">
+                                Review comment text...
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="empty-state" th:if="${reviews == null or reviews.isEmpty()}">
+                        <i class="fas fa-comment-slash"></i>
+                        <p>No reviews yet. Be the first to review this therapist!</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <div class="profile-card">
+                    <h2 class="section-title">
+                        <i class="fas fa-info-circle me-2"></i>Contact & Booking
+                    </h2>
+                    
+                    <div class="info-item">
+                        <div class="info-label">
+                            <i class="fas fa-clock me-2"></i>Availability
+                        </div>
+                        <div class="info-value" th:text="${therapist.availability != null ? therapist.availability : '9AM - 9PM Daily'}">
+                            9AM - 9PM Daily
+                        </div>
+                    </div>
+                    
+                    <div class="info-item" th:if="${therapist.languages != null and !therapist.languages.isEmpty()}">
+                        <div class="info-label">
+                            <i class="fas fa-language me-2"></i>Languages
+                        </div>
+                        <div class="info-value">
+                            <span th:each="lang, iterStat : ${therapist.languages}" 
+                                  th:text="${lang + (iterStat.last ? '' : ', ')}">Language</span>
+                        </div>
+                    </div>
+                    
+                    <div class="info-item" th:if="${therapist.location != null}">
+                        <div class="info-label">
+                            <i class="fas fa-map-marker-alt me-2"></i>Service Area
+                        </div>
+                        <div class="info-value" th:text="${therapist.location}">
+                            Ruse, Bulgaria
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        <a th:href="@{/bookings/new?therapistId={id}(id=${therapist.id})}" class="book-btn">
+                            <i class="fas fa-calendar-check me-2"></i>Book Appointment
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Empty State (if therapist not found) -->
+    <section class="container" th:if="${therapist == null}">
+        <div class="empty-state">
+            <i class="fas fa-user-slash"></i>
+            <h3 style="color: var(--spa-green-dark);">Therapist Not Found</h3>
+            <p>The therapist you're looking for doesn't exist or has been removed.</p>
+            <a th:href="@{/therapists}" class="book-btn mt-3">
+                <i class="fas fa-arrow-left me-2"></i>Back to Therapists
+            </a>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+
