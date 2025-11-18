@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Our Therapists | Healing Touch</title>
-    
+
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    
+
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <style>
         :root {
             --spa-green: #4a7c59;
@@ -19,32 +19,32 @@
             --spa-cream: #faf5e6;
             --spa-cream-light: #fffef7;
         }
-        
+
         body {
             background: linear-gradient(135deg, var(--spa-cream-light) 0%, var(--spa-cream) 100%);
             min-height: 100vh;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             padding-bottom: 2rem;
         }
-        
+
         .page-header {
             background: linear-gradient(135deg, rgba(74, 124, 89, 0.1) 0%, rgba(245, 245, 220, 0.3) 100%);
             padding: 3rem 0;
             margin-bottom: 3rem;
         }
-        
+
         .page-title {
             color: var(--spa-green-dark);
             font-weight: 700;
             font-size: 2.5rem;
             margin-bottom: 0.5rem;
         }
-        
+
         .page-subtitle {
             color: var(--spa-green);
             font-size: 1.1rem;
         }
-        
+
         .therapist-card {
             background: white;
             border-radius: 15px;
@@ -55,12 +55,12 @@
             border: 1px solid rgba(74, 124, 89, 0.2);
             margin-bottom: 2rem;
         }
-        
+
         .therapist-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 8px 15px rgba(74, 124, 89, 0.2);
         }
-        
+
         .therapist-image {
             width: 150px;
             height: 150px;
@@ -70,7 +70,7 @@
             margin: 0 auto 1.5rem;
             display: block;
         }
-        
+
         .therapist-name {
             color: var(--spa-green-dark);
             font-weight: 700;
@@ -78,7 +78,7 @@
             margin-bottom: 0.5rem;
             text-align: center;
         }
-        
+
         .therapist-title {
             color: var(--spa-green);
             font-size: 1rem;
@@ -86,11 +86,11 @@
             text-align: center;
             font-style: italic;
         }
-        
+
         .therapist-specialties {
             margin: 1.5rem 0;
         }
-        
+
         .specialty-badge {
             background: var(--spa-beige);
             color: var(--spa-green-dark);
@@ -101,13 +101,13 @@
             display: inline-block;
             border: 1px solid rgba(74, 124, 89, 0.3);
         }
-        
+
         .therapist-info {
             color: #555;
             line-height: 1.8;
             margin-bottom: 1.5rem;
         }
-        
+
         .therapist-stats {
             display: flex;
             justify-content: space-around;
@@ -116,23 +116,23 @@
             background: var(--spa-cream);
             border-radius: 10px;
         }
-        
+
         .stat-item {
             text-align: center;
         }
-        
+
         .stat-value {
             color: var(--spa-green-dark);
             font-weight: 700;
             font-size: 1.5rem;
             display: block;
         }
-        
+
         .stat-label {
             color: #666;
             font-size: 0.85rem;
         }
-        
+
         .view-profile-btn {
             background: linear-gradient(135deg, var(--spa-green) 0%, var(--spa-green-dark) 100%);
             color: white;
@@ -145,19 +145,19 @@
             text-align: center;
             width: 100%;
         }
-        
+
         .view-profile-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(74, 124, 89, 0.3);
             color: white;
         }
-        
+
         .empty-state {
             text-align: center;
             padding: 4rem 2rem;
             color: #666;
         }
-        
+
         .empty-state i {
             font-size: 5rem;
             color: var(--spa-green);
@@ -167,84 +167,86 @@
     </style>
 </head>
 <body>
-    <!-- Navbar -->
-    <div th:replace="~{fragments/navbar :: navbar}"></div>
-    
-    <!-- Page Header -->
-    <section class="page-header">
-        <div class="container">
-            <h1 class="page-title text-center">
-                <i class="fas fa-user-md me-2"></i>Our Therapists
-            </h1>
-            <p class="page-subtitle text-center">
-                Meet our experienced and certified massage therapy professionals
-            </p>
-        </div>
-    </section>
-    
-    <!-- Therapists Listing -->
-    <section class="container">
-        <div class="row" th:if="${therapists != null and !therapists.isEmpty()}">
-            <div class="col-md-6 col-lg-4" th:each="therapist : ${therapists}">
-                <div class="therapist-card">
-                    <img th:src="${therapist.imageUrl != null ? therapist.imageUrl : '/images/default-therapist.jpg'}" 
-                         th:alt="${'Photo of ' + therapist.firstName + ' ' + therapist.lastName}"
-                         class="therapist-image">
-                    
-                    <h3 class="therapist-name" th:text="${therapist.firstName + ' ' + therapist.lastName}">
-                        Therapist Name
-                    </h3>
-                    
-                    <p class="therapist-title" th:text="${therapist.title}">
-                        Certified Massage Therapist
-                    </p>
-                    
-                    <div class="therapist-stats">
-                        <div class="stat-item">
-                            <span class="stat-value" th:text="${therapist.experienceYears}">5</span>
-                            <span class="stat-label">Years</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-value" th:text="${therapist.rating != null ? #numbers.formatDecimal(therapist.rating, 1, 1) : 'N/A'}">4.8</span>
-                            <span class="stat-label">Rating</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-value" th:text="${therapist.totalSessions != null ? therapist.totalSessions : '500+'}">500+</span>
-                            <span class="stat-label">Sessions</span>
-                        </div>
+<!-- Navbar -->
+<div th:replace="~{fragments/header :: header}"></div>
+
+<!-- Page Header -->
+<section class="page-header">
+    <div class="container">
+        <h1 class="page-title text-center">
+            <i class="fas fa-user-md me-2"></i>Our Therapists
+        </h1>
+        <p class="page-subtitle text-center">
+            Meet our experienced and certified massage therapy professionals
+        </p>
+    </div>
+</section>
+
+<!-- Therapists Listing -->
+<section class="container">
+    <div class="row" th:if="${therapists != null and !therapists.isEmpty()}">
+        <div class="col-md-6 col-lg-4" th:each="therapist : ${therapists}">
+            <div class="therapist-card">
+                <img th:src="${therapist.profilePicture != null ? therapist.profilePicture : '/images/default-therapist.png'}"
+                     th:alt="${'Photo of ' + therapist.firstName + ' ' + therapist.lastName}"
+                     class="therapist-image">
+
+                <h3 class="therapist-name" th:text="${therapist.firstName + ' ' + therapist.lastName}">
+                    Therapist Name
+                </h3>
+
+                <p class="therapist-title" th:text="${therapist.title != null ? therapist.title : 'Certified Massage Therapist'}">
+                    Certified Massage Therapist
+                </p>
+
+                <div class="therapist-stats">
+                    <div class="stat-item">
+                        <span class="stat-value" th:text="${therapist.experienceYears != null ? therapist.experienceYears : 0}">5</span>
+                        <span class="stat-label">Years</span>
                     </div>
-                    
-                    <p class="therapist-info" th:text="${therapist.bio != null ? therapist.bio : 'Professional massage therapist dedicated to your wellness and relaxation.'}">
-                        Professional massage therapist with extensive experience in various massage techniques.
-                    </p>
-                    
-                    <div class="therapist-specialties" th:if="${therapist.specialties != null and !therapist.specialties.isEmpty()}">
-                        <span class="specialty-badge" th:each="specialty : ${therapist.specialties}" th:text="${specialty}">
+                    <div class="stat-item">
+                        <span class="stat-value" th:text="${therapist.rating != null ? #numbers.formatDecimal(therapist.rating, 1, 1) : 'N/A'}">4.8</span>
+                        <span class="stat-label">Rating</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" th:text="${therapist.totalSessions != null ? therapist.totalSessions : '500+'}">500+</span>
+                        <span class="stat-label">Sessions</span>
+                    </div>
+                </div>
+
+                <p class="therapist-info"
+                   th:text="${therapist.bio != null ? therapist.bio : 'Professional massage therapist dedicated to your wellness and relaxation.'}">
+                    Professional massage therapist with extensive experience in various massage techniques.
+                </p>
+
+                <div class="therapist-specialties"
+                     th:if="${therapist.skills != null and !therapist.skills.isEmpty()}">
+                        <span class="specialty-badge"
+                              th:each="skill : ${therapist.skills}"
+                              th:text="${skill}">
                             Specialty
                         </span>
-                    </div>
-                    
-                    <a th:href="@{/therapists/{id}(id=${therapist.id})}" class="view-profile-btn">
-                        <i class="fas fa-user-circle me-2"></i>View Profile
-                    </a>
                 </div>
+
+                <a th:href="@{/therapists/{id}(id=${therapist.id})}" class="view-profile-btn">
+                    <i class="fas fa-user-circle me-2"></i>View Profile
+                </a>
             </div>
         </div>
-        
-        <!-- Empty State -->
-        <div class="empty-state" th:if="${therapists == null or therapists.isEmpty()}">
-            <i class="fas fa-user-md"></i>
-            <h3 style="color: var(--spa-green-dark);">No Therapists Available</h3>
-            <p>We're currently updating our therapist listings. Please check back soon!</p>
-        </div>
-    </section>
-    
-    <!-- Footer -->
-    <div th:replace="~{fragments/footer :: footer}"></div>
-    
-    <!-- Bootstrap 5 JS Bundle -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" th:if="${therapists == null or therapists.isEmpty()}">
+        <i class="fas fa-user-md"></i>
+        <h3 style="color: var(--spa-green-dark);">No Therapists Available</h3>
+        <p>We're currently updating our therapist listings. Please check back soon!</p>
+    </div>
+</section>
+
+<!-- Footer -->
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<!-- Bootstrap 5 JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-
-

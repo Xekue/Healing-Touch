@@ -24,11 +24,15 @@ public class Therapist {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    private String firstName;
+
+    private String lastName;
+
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "therapist_skills", joinColumns = @JoinColumn(name = "therapist_id"))
     @Column(name = "skill")
     private List<String> skills = new ArrayList<>();
@@ -39,9 +43,12 @@ public class Therapist {
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal hourlyRate;
 
-    private boolean active;
+    @Column(nullable = false)
+    private boolean active = true;
 
-    //Audit fields
+    @Column(nullable = false)
+    private boolean deleted = false;
+
     @CreationTimestamp
     @Column(nullable = false)
     private LocalDateTime createdOn;
@@ -54,5 +61,33 @@ public class Therapist {
     private List<Booking> bookings = new ArrayList<>();
 
     private String profilePicture;
+
+    @Column(columnDefinition = "TEXT")
+    private String bio;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "therapist_specialties", joinColumns = @JoinColumn(name = "therapist_id"))
+    @Column(name = "specialty")
+    private List<String> specialties = new ArrayList<>();
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "therapist_certifications", joinColumns = @JoinColumn(name = "therapist_id"))
+    @Column(name = "certification")
+    private List<String> certifications = new ArrayList<>();
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "therapist_languages", joinColumns = @JoinColumn(name = "therapist_id"))
+    @Column(name = "language")
+    private List<String> languages = new ArrayList<>();
+
+    private Integer totalSessions = 0;
+
+    private Double rating = 0.0;
+
+    private String title;
+
+    private String location;
+
+    private String availability;
 
 }

@@ -1,6 +1,5 @@
 package bg.healingtouch.spring_core.booking.model;
 
-import bg.healingtouch.spring_core.review.model.Review;
 import bg.healingtouch.spring_core.therapist.model.Therapist;
 import bg.healingtouch.spring_core.user.model.User;
 import jakarta.persistence.*;
@@ -23,12 +22,10 @@ public class Booking {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    //Many bookings can belong to one customer
     @ManyToOne
     @JoinColumn(name = "customer_id", nullable = false)
     private User customer;
 
-    // Many bookings can belong to one therapist
     @ManyToOne
     @JoinColumn(name = "therapist_id", nullable = false)
     private Therapist therapist;
@@ -53,7 +50,6 @@ public class Booking {
     @Column(nullable = false)
     private PaymentStatus paymentStatus;
 
-    //Audit fields
     @CreationTimestamp
     @Column(nullable = false)
     private LocalDateTime createdOn;
@@ -62,11 +58,10 @@ public class Booking {
     @Column(nullable = false)
     private LocalDateTime updatedOn;
 
-    @OneToOne(mappedBy = "booking", cascade = CascadeType.ALL)
-    private Review review;
-
     @Column(nullable = false)
     private Integer durationMinutes;
+
+    private String notes;
 
     @Column(nullable = false)
     private BigDecimal price;
@@ -75,5 +70,8 @@ public class Booking {
 
     @Column
     private LocalDateTime completedOn;
+
+    @Transient
+    private bg.healingtouch.spring_core.client.dto.ReviewResponseDto review;
     
 }

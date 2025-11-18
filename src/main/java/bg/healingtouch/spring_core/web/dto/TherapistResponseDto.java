@@ -1,6 +1,7 @@
 package bg.healingtouch.spring_core.web.dto;
 
-import bg.healingtouch.spring_core.user.model.User;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,14 +18,44 @@ import java.util.UUID;
 public class TherapistResponseDto {
 
     private UUID id;
-    private String firstName;
-    private String lastName;
-    private boolean active;
 
-    private List<String> skills;
-    private Integer experienceYears;
-    private BigDecimal hourlyRate;
+    private UUID userId;
+
+    private String firstName;
+
+    private String lastName;
+
     private String profilePicture;
 
-    private User user;
+    private String title;
+
+    private Double rating;
+
+    @Size(max = 100, message = "Skill name too long")
+    private List<String> skills;
+
+    private String bio;
+
+    private List<String> specialties;
+
+    private List<String> certifications;
+
+    private List<String> languages;
+
+    @Positive(message = "Experience years must be positive")
+    private Integer experienceYears;
+
+    private int totalSessions;
+
+    private String availability;
+
+    @Positive(message = "Hourly rate must be positive")
+    private BigDecimal hourlyRate;
+
+    private Boolean active;
+
+    private String location;
+
+    private Boolean deleted;
+
 }

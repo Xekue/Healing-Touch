@@ -21,6 +21,7 @@ public class BookingResponseDto {
     private UUID id;
     private UUID customerId;
     private UUID therapistId;
+    private String therapistName;
     private MassageType massageType;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
@@ -28,3 +29,5 @@ public class BookingResponseDto {
     private PaymentStatus paymentStatus;
     private BigDecimal price;
 }
+
+//Server -> Client response

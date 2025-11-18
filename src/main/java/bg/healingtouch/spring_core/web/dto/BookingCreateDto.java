@@ -22,10 +22,12 @@ public class BookingCreateDto {
     @Future(message = "Start time must be in the future")
     private LocalDateTime startTime;
 
-    @NotNull(message = "End time is required")
-    @Future(message = "End time must be in the future")
-    private LocalDateTime endTime;
-
     @Size(max = 255, message = "Location must be less than 255 characters")
     private String location;
+
+    private String notes;
+
+    private Integer durationMinutes;
 }
+
+//Client -> Server response

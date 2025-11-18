@@ -5,9 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard | HealingTouch</title>
 
-    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
@@ -27,6 +25,7 @@
         }
 
         main { flex: 1; padding: 3rem 0; }
+
         .dashboard-card {
             background: #fff;
             border-radius: 20px;
@@ -34,9 +33,12 @@
             box-shadow: 0 8px 30px rgba(0,0,0,0.12);
         }
 
-        .page-title { color: var(--spa-green-dark); font-weight: 600; }
+        .page-title {
+            color: var(--spa-green-dark);
+            font-weight: 600;
+        }
 
-        /* Badges */
+        /** BADGES **/
         .role-badge, .status-badge {
             padding: 0.4rem 0.8rem;
             border-radius: 20px;
@@ -47,34 +49,38 @@
         .role-admin { background: #fff3cd; color: #856404; }
         .role-therapist { background: #d1ecf1; color: #0c5460; }
         .role-user { background: #d4edda; color: #155724; }
-        .status-active { background: #d4edda; color: #155724; }
-        .status-inactive { background: #f8d7da; color: #721c24; }
+        .status-deleted { background: #e74c3c; color: #fff; }
 
-        /* Buttons */
+        /** BUTTONS **/
         .btn-sm { padding: 0.35rem 0.75rem; font-size: 0.875rem; border-radius: 20px; font-weight: 600; }
-        .btn-therapist { background: #87a96b; color: #fff; border: none; }
-        .btn-therapist:hover { background: #6f8f5b; }
-        .btn-admin { background: #f0ad4e; color: #fff; border: none; }
-        .btn-admin:hover { background: #e0941a; }
-        .btn-demote { background: #6c757d; color: white; border: none; }
-        .btn-demote:hover { background: #5a6268; }
-        .btn-delete { background: #dc3545; color: white; border: none; }
-        .btn-delete:hover { background: #c82333; }
+        .btn-therapist { background: #87a96b; color: #fff; }
+        .btn-admin { background: #f0ad4e; color: #fff; }
+        .btn-demote { background: #6c757d; color: white; }
+        .btn-delete { background: #dc3545; color: white; }
 
-        /* Slider switch */
-        .switch { position: relative; display: inline-block; width: 50px; height: 25px; }
+        /** TOGGLE SWITCH **/
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 25px;
+        }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider {
-            position: absolute; cursor: pointer;
+            position: absolute;
+            cursor: pointer;
             top: 0; left: 0; right: 0; bottom: 0;
             background-color: #ccc;
             transition: .4s;
             border-radius: 25px;
         }
         .slider:before {
-            position: absolute; content: "";
-            height: 19px; width: 19px;
-            left: 3px; bottom: 3px;
+            position: absolute;
+            content: "";
+            height: 19px;
+            width: 19px;
+            left: 3px;
+            bottom: 3px;
             background-color: white;
             transition: .4s;
             border-radius: 50%;
@@ -82,36 +88,57 @@
         input:checked + .slider { background-color: var(--spa-green); }
         input:checked + .slider:before { transform: translateX(25px); }
 
-        .empty-state { text-align: center; padding: 3rem; color: #777; }
+        /** EMPTY STATE **/
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #777;
+        }
+
+        /** SOFT-DELETED LOOK **/
+        .deleted-row {
+            opacity: 0.45;
+            filter: grayscale(60%);
+            pointer-events: none; /* prevents toggles/actions */
+        }
+        .deleted-row td {
+            text-decoration: line-through;
+            color: #a0a0a0 !important;
+        }
     </style>
 </head>
 <body>
+
 <div th:replace="~{fragments/header :: header}"></div>
 
 <main>
     <div class="container">
         <div class="dashboard-card">
-            <h1 class="page-title mb-3"><i class="fas fa-tachometer-alt me-2"></i>Admin Dashboard</h1>
+
+            <h1 class="page-title mb-3">
+                <i class="fas fa-tachometer-alt me-2"></i>Admin Dashboard
+            </h1>
             <p class="text-muted mb-4">Manage users and therapists</p>
 
-            <!-- Tabs -->
-            <ul class="nav nav-tabs" id="adminTabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab">
+            <!-- TABS -->
+            <ul class="nav nav-tabs" id="adminTabs">
+                <li class="nav-item">
+                    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#users">
                         <i class="fas fa-users me-2"></i>Users
                     </button>
                 </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="therapists-tab" data-bs-toggle="tab" data-bs-target="#therapists" type="button" role="tab">
+                <li class="nav-item">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#therapists">
                         <i class="fas fa-user-md me-2"></i>Therapists
                     </button>
                 </li>
             </ul>
 
-            <div class="tab-content mt-4" id="adminTabsContent">
+            <div class="tab-content mt-4">
 
                 <!-- USERS TAB -->
-                <div class="tab-pane fade show active" id="users" role="tabpanel">
+                <div class="tab-pane fade show active" id="users">
+
                     <div th:if="${users != null and !users.isEmpty()}">
                         <table class="table table-hover align-middle">
                             <thead>
@@ -123,50 +150,60 @@
                                 <th>Actions</th>
                             </tr>
                             </thead>
+
                             <tbody>
                             <tr th:each="user : ${users}">
                                 <td th:text="${user.id}"></td>
                                 <td th:text="${user.username}"></td>
+
                                 <td>
                                     <span class="role-badge"
-                                          th:classappend="${'role-' + (user.role != null ? user.role.name().toLowerCase() : 'user')}"
-                                          th:text="${user.role != null ? user.role.name() : 'USER'}">
-                                    </span>
+                                          th:classappend="' role-' + ${user.role.name().toLowerCase()}"
+                                          th:text="${user.role.name()}"></span>
                                 </td>
+
                                 <td>
                                     <label class="switch">
                                         <input type="checkbox"
                                                th:checked="${user.active}"
+                                               th:disabled="${user.id == loggedUserId}"
                                                th:attr="data-form-id='toggleUserForm-' + ${user.id}"
                                                onchange="submitToggleForm(this)">
                                         <span class="slider"></span>
                                     </label>
+
                                     <form th:id="'toggleUserForm-' + ${user.id}"
                                           th:action="@{'/admin/users/' + ${user.id} + '/toggle-status'}"
-                                          method="post" style="display:none;"></form>
+                                          method="post"></form>
                                 </td>
+
                                 <td>
                                     <div class="btn-group">
-                                        <form th:action="@{'/admin/users/' + ${user.id} + '/promote-therapist'}" method="post">
-                                            <button type="submit" class="btn btn-sm btn-therapist"
-                                                    th:if="${user.role.name() == 'CUSTOMER'}">
+
+                                        <form th:if="${user.role.name() == 'CUSTOMER' and user.id != loggedUserId}"
+                                              th:action="@{'/admin/users/' + ${user.id} + '/promote-therapist'}"
+                                              method="post">
+                                            <button class="btn btn-sm btn-therapist">
                                                 <i class="fas fa-user-md me-1"></i>Therapist
                                             </button>
                                         </form>
 
-                                        <form th:action="@{'/admin/users/' + ${user.id} + '/promote-admin'}" method="post">
-                                            <button type="submit" class="btn btn-sm btn-admin"
-                                                    th:if="${user.role.name() != 'ADMIN'}">
+                                        <form th:if="${user.role.name() != 'ADMIN' and user.id != loggedUserId}"
+                                              th:action="@{'/admin/users/' + ${user.id} + '/promote-admin'}"
+                                              method="post">
+                                            <button class="btn btn-sm btn-admin">
                                                 <i class="fas fa-user-shield me-1"></i>Admin
                                             </button>
                                         </form>
 
-                                        <form th:action="@{'/admin/users/' + ${user.id} + '/demote'}" method="post">
-                                            <button type="submit" class="btn btn-sm btn-demote"
-                                                    th:if="${user.role.name() != 'CUSTOMER'}">
+                                        <form th:if="${user.role.name() != 'CUSTOMER' and user.id != loggedUserId}"
+                                              th:action="@{'/admin/users/' + ${user.id} + '/demote'}"
+                                              method="post">
+                                            <button class="btn btn-sm btn-demote">
                                                 <i class="fas fa-arrow-down me-1"></i>Demote
                                             </button>
                                         </form>
+
                                     </div>
                                 </td>
                             </tr>
@@ -177,48 +214,60 @@
                     <div class="empty-state" th:if="${users == null or users.isEmpty()}">
                         <i class="fas fa-users fa-3x mb-3"></i>
                         <h4>No Users Found</h4>
-                        <p>There are no users in the system yet.</p>
+                        <p>No users exist in the system yet.</p>
                     </div>
                 </div>
 
                 <!-- THERAPISTS TAB -->
-                <div class="tab-pane fade" id="therapists" role="tabpanel">
+                <div class="tab-pane fade" id="therapists">
+
                     <div th:if="${therapists != null and !therapists.isEmpty()}">
                         <table class="table table-hover align-middle">
                             <thead>
                             <tr>
                                 <th>ID</th>
                                 <th>Name</th>
-                                <th>Experience (Years)</th>
+                                <th>Experience</th>
                                 <th>Status</th>
                                 <th>Actions</th>
                             </tr>
                             </thead>
+
                             <tbody>
-                            <tr th:each="therapist : ${therapists}">
+                            <tr th:each="therapist : ${therapists}"
+                                th:classappend="${therapist.deleted} ? 'deleted-row'">
                                 <td th:text="${therapist.id}"></td>
-                                <td th:text="${therapist.firstName != null ? therapist.firstName + ' ' + therapist.lastName : 'N/A'}"></td>
-                                <td th:text="${therapist.experienceYears != null ? therapist.experienceYears : 'N/A'}"></td>
+                                <td th:text="${therapist.firstName + ' ' + therapist.lastName}"></td>
+                                <td th:text="${therapist.experienceYears}"></td>
+
                                 <td>
-                                    <label class="switch">
+                                    <span th:if="${therapist.deleted}"
+                                          class="status-badge status-deleted">DELETED</span>
+
+                                    <label class="switch" th:if="${!therapist.deleted}">
                                         <input type="checkbox"
                                                th:checked="${therapist.active}"
                                                th:attr="data-form-id='toggleTherapistForm-' + ${therapist.id}"
                                                onchange="submitToggleForm(this)">
                                         <span class="slider"></span>
                                     </label>
+
                                     <form th:id="'toggleTherapistForm-' + ${therapist.id}"
                                           th:action="@{'/admin/therapists/' + ${therapist.id} + '/toggle-status'}"
-                                          method="post" style="display:none;"></form>
+                                          method="post"></form>
                                 </td>
+
                                 <td>
-                                    <form th:action="@{'/admin/therapists/' + ${therapist.id} + '/delete'}" method="post">
-                                        <button type="submit" class="btn btn-sm btn-delete"
-                                                onclick="return confirm('Are you sure you want to delete this therapist?');">
-                                            <i class="fas fa-trash me-1"></i>Delete
+                                    <form th:if="${!therapist.deleted}"
+                                          th:action="@{'/admin/therapists/' + ${therapist.id} + '/delete'}"
+                                          method="post">
+                                        <button class="btn btn-sm btn-delete"
+                                                onclick="return confirm('Soft delete this therapist?')">
+                                            <i class="fas fa-trash me-1"></i>Soft Delete
                                         </button>
                                     </form>
                                 </td>
+
                             </tr>
                             </tbody>
                         </table>
@@ -227,11 +276,13 @@
                     <div class="empty-state" th:if="${therapists == null or therapists.isEmpty()}">
                         <i class="fas fa-user-md fa-3x mb-3"></i>
                         <h4>No Therapists Found</h4>
-                        <p>There are no therapists in the system yet.</p>
+                        <p>No therapists exist yet.</p>
                     </div>
+
                 </div>
 
             </div>
+
         </div>
     </div>
 </main>
@@ -240,13 +291,13 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- ✅ Safe JS toggle function -->
 <script>
     function submitToggleForm(element) {
-        const formId = element.getAttribute('data-form-id');
-        const form = document.getElementById(formId);
+        const id = element.getAttribute("data-form-id");
+        const form = document.getElementById(id);
         if (form) form.submit();
     }
 </script>
+
 </body>
 </html>

@@ -23,6 +23,10 @@ public class AuthenticationMetadata implements UserDetails {
     private UserRoles role;
     private boolean isActive;
 
+    public UUID getId() {
+        return userId;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
@@ -57,4 +61,5 @@ public class AuthenticationMetadata implements UserDetails {
     public boolean isEnabled() {
         return isActive;
     }
+
 }

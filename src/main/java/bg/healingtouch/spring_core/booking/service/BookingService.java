@@ -2,7 +2,6 @@ package bg.healingtouch.spring_core.booking.service;
 
 import bg.healingtouch.spring_core.booking.model.Booking;
 import bg.healingtouch.spring_core.booking.model.BookingStatus;
-import bg.healingtouch.spring_core.booking.model.MassageType;
 import bg.healingtouch.spring_core.booking.model.PaymentStatus;
 import bg.healingtouch.spring_core.booking.repository.BookingRepository;
 import bg.healingtouch.spring_core.client.ReviewClient;
@@ -10,18 +9,20 @@ import bg.healingtouch.spring_core.client.dto.CreateReviewDto;
 import bg.healingtouch.spring_core.client.dto.ReviewResponseDto;
 import bg.healingtouch.spring_core.therapist.model.Therapist;
 import bg.healingtouch.spring_core.therapist.repository.TherapistRepository;
+import bg.healingtouch.spring_core.therapist.service.TherapistService;
 import bg.healingtouch.spring_core.user.model.User;
 import bg.healingtouch.spring_core.user.repository.UserRepository;
+import bg.healingtouch.spring_core.user.service.UserService;
 import bg.healingtouch.spring_core.web.dto.BookingCreateDto;
 import bg.healingtouch.spring_core.web.dto.BookingResponseDto;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -34,35 +35,31 @@ public class BookingService {
     private final TherapistRepository therapistRepository;
     private final UserRepository userRepository;
     private final ReviewClient reviewClient;
+    private final UserService userService;
+    private final TherapistService therapistService;
 
     private static final Logger log = LoggerFactory.getLogger(BookingService.class);
 
     @Transactional
-    public BookingResponseDto createBooking(@Valid BookingCreateDto dto, String username) {
-        User customer = userRepository.findByUsername(username)
-                .orElseThrow(() -> new EntityNotFoundException("Customer not found"));
+    public BookingResponseDto createBooking(BookingCreateDto dto, UUID customerId) {
 
-        Therapist therapist = therapistRepository.findById(dto.getTherapistId())
-                .orElseThrow(() -> new EntityNotFoundException("Therapist not found"));
+        User customer = userService.getById(customerId);
 
-        MassageType massageType = dto.getMassageType();
-        int duration = massageType.getDurationMinutes();
-        LocalDateTime endTime = dto.getStartTime().plusMinutes(duration);
+        Therapist therapist = therapistService.getById(dto.getTherapistId());
 
-        boolean conflict = bookingRepository
-                .existsByTherapistIdAndStartTimeLessThanEqualAndEndTimeGreaterThanEqual(
-                        therapist.getId(), endTime, dto.getStartTime());
-
-        if (conflict) {
-            throw new IllegalStateException("Therapist not available at selected time");
-        }
+        BigDecimal price = calculatePrice(dto.getDurationMinutes());
+        LocalDateTime endTime = dto.getStartTime().plusMinutes(dto.getDurationMinutes());
 
         Booking booking = new Booking();
         booking.setCustomer(customer);
         booking.setTherapist(therapist);
-        booking.setMassageType(massageType);
+        booking.setMassageType(dto.getMassageType());
         booking.setStartTime(dto.getStartTime());
         booking.setEndTime(endTime);
+        booking.setDurationMinutes(dto.getDurationMinutes());
+        booking.setNotes(dto.getNotes());
+        booking.setLocation(dto.getLocation());
+        booking.setPrice(price);
         booking.setBookingStatus(BookingStatus.PENDING);
         booking.setPaymentStatus(PaymentStatus.PENDING);
 
@@ -72,34 +69,47 @@ public class BookingService {
                 booking.getId(),
                 customer.getId(),
                 therapist.getId(),
-                massageType,
+                therapist.getFirstName() + " " + therapist.getLastName(),
+                booking.getMassageType(),
                 booking.getStartTime(),
                 booking.getEndTime(),
                 booking.getBookingStatus(),
                 booking.getPaymentStatus(),
-                massageType.getBasePrice()
+                booking.getPrice()
         );
     }
 
-    private BookingResponseDto mapToResponseDto(Booking booking) {
-        BookingResponseDto dto = new BookingResponseDto();
-        dto.setId(booking.getId());
-        dto.setCustomerId(booking.getCustomer().getId());
-        dto.setTherapistId(booking.getTherapist().getId());
-        dto.setMassageType(booking.getMassageType());
-        dto.setStartTime(booking.getStartTime());
-        dto.setEndTime(booking.getEndTime());
-        dto.setStatus(booking.getBookingStatus());
-        dto.setPaymentStatus(booking.getPaymentStatus());
-        dto.setPrice(null); // add this for pricing logic if added later!!!
-        return dto;
+    private BigDecimal calculatePrice(Integer duration) {
+        if (duration == null) return BigDecimal.ZERO;
+
+        return switch (duration) {
+            case 30 -> BigDecimal.valueOf(45);
+            case 60 -> BigDecimal.valueOf(60);
+            case 90 -> BigDecimal.valueOf(90);
+            case 120 -> BigDecimal.valueOf(120);
+            default -> BigDecimal.ZERO;
+        };
     }
 
-    public List<BookingResponseDto> getBookingsForUser(String username) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+    private BookingResponseDto mapToResponseDto(Booking booking) {
+        return new BookingResponseDto(
+                booking.getId(),
+                booking.getCustomer().getId(),
+                booking.getTherapist().getId(),
+                booking.getTherapist().getUser().getFirstName() + " " +
+                        booking.getTherapist().getUser().getLastName(),
+                booking.getMassageType(),
+                booking.getStartTime(),
+                booking.getEndTime(),
+                booking.getBookingStatus(),
+                booking.getPaymentStatus(),
+                booking.getPrice()
+        );
+    }
 
-        return bookingRepository.findByCustomerId(user.getId())
+    public List<BookingResponseDto> getBookingsForUser(UUID userId) {
+
+        return bookingRepository.findByCustomerId(userId)
                 .stream()
                 .map(this::mapToResponseDto)
                 .toList();
@@ -126,7 +136,6 @@ public class BookingService {
         bookingRepository.save(booking);
     }
 
-    //REVIEW LOGIC
     @Transactional
     public ReviewResponseDto submitReview(UUID bookingId, String username, int rating, String comment) {
         User customer = userRepository.findByUsername(username)
@@ -149,9 +158,9 @@ public class BookingService {
         return reviewClient.createReview(dto);
     }
 
-    //APPROVE and DECLINE logic!!!
+
     @Transactional
-    public BookingResponseDto approveBooking(UUID bookingId, String therapistUsername) {
+    public void approveBooking(UUID bookingId, String therapistUsername) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new EntityNotFoundException("Booking not found"));
 
@@ -165,11 +174,11 @@ public class BookingService {
 
         booking.setBookingStatus(BookingStatus.CONFIRMED);
         bookingRepository.save(booking);
-        return mapToResponseDto(booking);
+        mapToResponseDto(booking);
     }
 
     @Transactional
-    public BookingResponseDto declineBooking(UUID bookingId, String therapistUsername) {
+    public void declineBooking(UUID bookingId, String therapistUsername) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new EntityNotFoundException("Booking not found"));
 
@@ -181,14 +190,17 @@ public class BookingService {
             throw new IllegalStateException("Only pending bookings can be declined.");
         }
 
-        booking.setBookingStatus(BookingStatus.CANCELLED);
+        booking.setBookingStatus(BookingStatus.DECLINED);
         bookingRepository.save(booking);
-        return mapToResponseDto(booking);
+        mapToResponseDto(booking);
     }
 
     public List<BookingResponseDto> getBookingsForTherapist(String username) {
-        Therapist therapist = therapistRepository.findByUserUsername(username)
-                .orElseThrow(() -> new EntityNotFoundException("Therapist not found"));
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+        Therapist therapist = therapistRepository.findByUserIdAndDeletedFalse(user.getId())
+                .orElseThrow(() -> new EntityNotFoundException("Therapist not found or is deleted"));
 
         return bookingRepository.findByTherapistId(therapist.getId())
                 .stream()
@@ -196,7 +208,6 @@ public class BookingService {
                 .toList();
     }
 
-    //COMPLETE Booking
     @Transactional
     public void completeBooking(UUID bookingId, String therapistUsername) {
         Booking booking = bookingRepository.findById(bookingId)
@@ -215,6 +226,4 @@ public class BookingService {
         booking.setCompletedOn(LocalDateTime.now());
         bookingRepository.save(booking);
     }
-
-
 }

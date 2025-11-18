@@ -11,7 +11,8 @@ public interface TherapistRepository extends JpaRepository<Therapist, UUID> {
 
     Optional<Therapist> findByUserId(UUID userId);
 
-    List<Therapist> findAllByActiveTrue();
+    Optional<Therapist> findByUserIdAndDeletedFalse(UUID userId);
 
-    Optional<Therapist> findByUserUsername(String username);
+    List<Therapist> findAllByActiveTrueAndDeletedFalse();
+
 }

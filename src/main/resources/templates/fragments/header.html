@@ -1,51 +1,176 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
 <head></head>
 <body>
-  <!-- Header Fragment with Navbar -->
-  <header th:fragment="header">
-    <nav class="navbar navbar-expand-lg navbar-light" style="background: linear-gradient(135deg, #f5f5dc 0%, #faf5e6 100%); border-bottom: 2px solid #c4b5a0;">
-      <div class="container">
-        <a class="navbar-brand d-flex align-items-center" th:href="@{/}" style="color: #2d5016; font-weight: 700; font-size: 1.5rem; text-decoration: none;">
-          <i class="fas fa-spa me-2" style="color: #4a7c59;"></i>
-          HealingTouch
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav ms-auto">
-            <li class="nav-item">
-              <a class="nav-link" th:href="@{/}" style="color: #2d5016; font-weight: 500;">
-                <i class="fas fa-home me-1"></i>Home
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" th:href="@{/therapists}" style="color: #2d5016; font-weight: 500;">
-                <i class="fas fa-user-md me-1"></i>Therapists
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" th:href="@{/my-bookings}" style="color: #2d5016; font-weight: 500;">
-                <i class="fas fa-calendar-check me-1"></i>My Bookings
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" th:href="@{/login}" style="color: #2d5016; font-weight: 500;">
-                <i class="fas fa-sign-in-alt me-1"></i>Login
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" th:href="@{/register}" style="color: #2d5016; font-weight: 500;">
-                <i class="fas fa-user-plus me-1"></i>Register
-              </a>
-            </li>
-          </ul>
+
+<header th:fragment="header">
+    <nav class="navbar navbar-expand-lg navbar-light shadow-sm"
+         style="background: linear-gradient(135deg, #faf5e6, #f5f5dc);
+                border-bottom: 2px solid #d8cfc0;">
+        <div class="container">
+
+            <!-- Logo -->
+            <a class="navbar-brand d-flex align-items-center" th:href="@{/}"
+               style="color:#2d5016; font-weight:700; font-size:1.6rem;">
+                <i class="fas fa-spa me-2" style="color:#4a7c59;"></i>
+                HealingTouch
+            </a>
+
+            <!-- Mobile Toggle -->
+            <button class="navbar-toggler" type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Navbar Links -->
+            <div class="collapse navbar-collapse" id="navbarNav">
+
+                <ul class="navbar-nav ms-auto align-items-lg-center">
+
+                    <!-- PUBLIC LINKS -->
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/}">
+                            <i class="fas fa-home me-1"></i> Home
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/therapists}">
+                            <i class="fas fa-user-md me-1"></i> Therapists
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/services}">
+                            <i class="fas fa-hands-helping me-1"></i> Services
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/about}">
+                            <i class="fas fa-info-circle me-1"></i> About
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/contact}">
+                            <i class="fas fa-envelope me-1"></i> Contact
+                        </a>
+                    </li>
+
+
+                    <!-- MAIN CTA: Book a Session -->
+                    <li class="nav-item ms-lg-3">
+                        <a class="nav-link fw-semibold"
+                           th:href="@{/bookings/new}"
+                           sec:authorize="isAuthenticated()"
+                           style="padding:8px 18px;
+                                  border-radius:20px;
+                                  border:2px solid #4a7c59;
+                                  color:#4a7c59;">
+                            <i class="fas fa-calendar-plus me-1"></i>
+                            Book a Session
+                        </a>
+
+                        <!-- When user is not logged in -->
+                        <a class="nav-link fw-semibold"
+                           th:href="@{/login}"
+                           sec:authorize="isAnonymous()"
+                           style="padding:8px 18px;
+                                  border-radius:20px;
+                                  border:2px solid #4a7c59;
+                                  color:#4a7c59;">
+                            <i class="fas fa-calendar-plus me-1"></i> Book a Session
+                        </a>
+                    </li>
+
+
+                    <!-- MY BOOKINGS (authenticated only) -->
+                    <li class="nav-item" sec:authorize="isAuthenticated()">
+                        <a class="nav-link" th:href="@{/bookings/my}">
+                            <i class="fas fa-calendar-check me-1"></i>
+                            My Bookings
+                        </a>
+                    </li>
+
+
+                    <!-- ADMIN DASHBOARD -->
+                    <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                        <a class="nav-link fw-semibold" th:href="@{/admin/dashboard}">
+                            <i class="fas fa-tools me-1"></i> Admin Dashboard
+                        </a>
+                    </li>
+
+
+                    <!-- LOGIN & REGISTER (anonymous) -->
+                    <li class="nav-item" sec:authorize="isAnonymous()">
+                        <a class="nav-link" th:href="@{/login}">
+                            <i class="fas fa-sign-in-alt me-1"></i> Login
+                        </a>
+                    </li>
+
+                    <li class="nav-item" sec:authorize="isAnonymous()">
+                        <a class="nav-link" th:href="@{/register}">
+                            <i class="fas fa-user-plus me-1"></i> Register
+                        </a>
+                    </li>
+
+
+                    <!-- USER DROPDOWN (authenticated) -->
+                    <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
+                        <a class="nav-link dropdown-toggle"
+                           href="#" id="userDropdown"
+                           role="button"
+                           data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle me-1"></i>
+                            <span th:text="${#authentication.name}">User</span>
+                        </a>
+
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <a class="dropdown-item" th:href="@{/profile}">
+                                    <i class="fas fa-id-badge me-2"></i> Profile
+                                </a>
+                            </li>
+
+                            <li><hr class="dropdown-divider"></li>
+
+                            <li>
+                                <form th:action="@{/logout}" method="post">
+                                    <button class="dropdown-item">
+                                        <i class="fas fa-sign-out-alt me-2"></i> Logout
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+
+                </ul>
+            </div>
         </div>
-      </div>
     </nav>
-  </header>
+
+    <style>
+        .nav-link {
+            color: #2d5016 !important;
+            font-weight: 500;
+            padding: 8px 12px !important;
+            transition: 0.2s;
+        }
+
+        .nav-link:hover {
+            color: #4a7c59 !important;
+            transform: translateY(-1px);
+        }
+
+        .navbar-brand:hover {
+            transform: translateY(-1px);
+        }
+    </style>
+
+</header>
+
 </body>
 </html>
-

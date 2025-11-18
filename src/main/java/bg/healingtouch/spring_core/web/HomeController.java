@@ -1,6 +1,5 @@
 package bg.healingtouch.spring_core.web;
 
-import bg.healingtouch.spring_core.booking.model.MassageType;
 import bg.healingtouch.spring_core.security.AuthenticationMetadata;
 import bg.healingtouch.spring_core.therapist.service.TherapistService;
 import bg.healingtouch.spring_core.user.model.User;
@@ -31,7 +30,6 @@ public class HomeController {
         return "index";
     }
 
-
     @GetMapping("/login")
     public String getLoginPage(@RequestParam(value = "error", required = false) String errorParam,
                                @ModelAttribute(value = "successMessage") String successMessage,
@@ -46,31 +44,17 @@ public class HomeController {
         if (successMessage != null && !successMessage.isBlank()) {
             model.addAttribute("successMessage", successMessage);
         }
+
         return "login";
     }
 
-
     @GetMapping("/register")
-    public String getRegisterPage(
-            Model model,
-            @ModelAttribute(value = "successMessage") String successMessage,
-            @ModelAttribute(value = "errorMessage") String errorMessage) {
-
+    public String getRegisterPage(Model model) {
         if (!model.containsAttribute("registerRequest")) {
             model.addAttribute("registerRequest", new RegisterDto());
         }
-
-        if (successMessage != null && !successMessage.isBlank()) {
-            model.addAttribute("successMessage", successMessage);
-        }
-
-        if (errorMessage != null && !errorMessage.isBlank()) {
-            model.addAttribute("errorMessage", errorMessage);
-        }
-
         return "register";
     }
-
 
     @PostMapping("/register")
     public String registerNewUser(@Valid @ModelAttribute("registerRequest") RegisterDto registerDto,
@@ -84,29 +68,11 @@ public class HomeController {
             return "redirect:/register";
         }
 
-        // Check for existing username or email
-        if (userService.existsByUsername(registerDto.getUsername())) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Username is already taken. Please choose another.");
-            redirectAttributes.addFlashAttribute("registerRequest", registerDto);
-            return "redirect:/register";
-        }
+        userService.registerNewUser(registerDto);
 
-        if (userService.existsByEmail(registerDto.getEmail())) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Email is already registered. Please use a different one.");
-            redirectAttributes.addFlashAttribute("registerRequest", registerDto);
-            return "redirect:/register";
-        }
-
-        try {
-            userService.register(registerDto);
-            redirectAttributes.addFlashAttribute("successMessage", "Registration successful! Please log in.");
-            return "redirect:/login";
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Registration failed: " + e.getMessage());
-            return "redirect:/register";
-        }
+        redirectAttributes.addFlashAttribute("successMessage", "Registration successful! Please log in.");
+        return "redirect:/login";
     }
-
 
     @GetMapping("/profile")
     public String getProfilePage(@AuthenticationPrincipal AuthenticationMetadata auth,
@@ -138,10 +104,7 @@ public class HomeController {
     }
 
     @GetMapping("/about")
-    public String showAboutPage(@AuthenticationPrincipal AuthenticationMetadata auth) {
-        if (auth != null) {
-            return "redirect:/";
-        }
+    public String showAboutPage() {
         return "about";
     }
 

@@ -1,5 +1,5 @@
 package bg.healingtouch.spring_core.booking.model;
 
 public enum BookingStatus {
-    PENDING, CONFIRMED, CANCELLED, COMPLETED
+    PENDING, CONFIRMED, CANCELLED, COMPLETED, DECLINED
 }

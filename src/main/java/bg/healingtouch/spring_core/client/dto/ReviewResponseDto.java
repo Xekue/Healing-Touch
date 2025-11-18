@@ -13,9 +13,14 @@ import java.util.UUID;
 public class ReviewResponseDto {
 
     private UUID id;
+    private UUID bookingId;
     private UUID therapistId;
-    private UUID userId;
+    private UUID customerId;
     private String comment;
     private int rating;
     private LocalDateTime createdOn;
+    private String reviewerName;
+
+    private LocalDateTime reviewDate;
+
 }

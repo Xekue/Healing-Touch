@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -17,18 +16,9 @@ import java.util.UUID;
 @AllArgsConstructor
 public class AddTherapistDto {
 
-    @NotNull(message = "User ID is required")
-    private UUID userId;
+        @NotNull
+        private UUID userId;
 
-    private List<String> skills;
-
-    @Positive(message = "Experience must be positive")
-    private int experienceYears;
-
-    @Positive(message = "Hourly rate must be positive")
-    private BigDecimal hourlyRate;
-
-    private boolean active;
-
-    private String profilePicture;
+        @Positive
+        private BigDecimal hourlyRate;
 }

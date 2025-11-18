@@ -5,57 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="${service.name()} + ' Massage | Healing Touch'">Massage Details</title>
 
+    <!-- SAME as services.html -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/styles.css}">
-    <link rel="icon" th:href="@{/images/logo.png}">
+
     <style>
         body {
+            background: linear-gradient(135deg, #faf5e6, #fffef7);
             font-family: "Poppins", sans-serif;
-            background-color: #faf9f8;
-            color: #333;
-            margin: 0;
-            padding: 0;
-        }
-
-        header, footer {
-            text-align: center;
-            padding: 1rem;
-            background-color: #fff;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            color: #2b6e63;
         }
 
         main {
             max-width: 900px;
             margin: 3rem auto;
             background: #fff;
-            padding: 2rem;
-            border-radius: 16px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .service-header {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .service-header img {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            object-fit: cover;
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.12);
         }
 
         h1 {
             font-size: 2rem;
+            font-weight: 700;
             color: #2b6e63;
-            margin: 0;
         }
 
-        .details {
-            margin-top: 1.5rem;
-            line-height: 1.7;
-        }
+        .details { margin-top: 1.5rem; line-height: 1.8; }
 
         .who-for {
             background-color: #e7f5f0;
@@ -64,66 +42,40 @@
             margin-top: 2rem;
         }
 
-        .who-for h3 {
-            margin-top: 0;
-            color: #1f4f46;
-        }
-
-        .info-section {
-            margin-top: 2rem;
-        }
-
         .book-btn {
             display: inline-block;
             background-color: #2b6e63;
             color: #fff;
-            text-decoration: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            font-weight: 600;
+            padding: 0.8rem 1.7rem;
+            border-radius: 10px;
+            font-weight:600;
+            text-decoration:none;
             margin-top: 2rem;
-            transition: background-color 0.3s ease;
-        }
-
-        .book-btn:hover {
-            background-color: #245b52;
         }
 
         .back-link {
-            display: inline-block;
-            margin-top: 1rem;
-            color: #2b6e63;
-            text-decoration: none;
+            display:inline-block;
+            margin-top:1rem;
+            color:#2b6e63;
+            text-decoration:none;
         }
-
         .back-link:hover {
             text-decoration: underline;
         }
-
-        @media (max-width: 768px) {
-            main {
-                margin: 1rem;
-                padding: 1.5rem;
-            }
-            h1 {
-                font-size: 1.6rem;
-            }
-        }
     </style>
 </head>
+
 <body>
 
-<header>
-    <a th:href="@{/}" style="text-decoration:none; color:#2b6e63;">
-        <h2>Healing Touch</h2>
-    </a>
-</header>
+<!-- ✅ Use your real navbar fragment -->
+<div th:replace="~{fragments/header :: header}"></div>
 
 <main>
-    <div class="service-header">
-        <h1 th:text="${service.name()} + ' Massage'"></h1>
-    </div>
 
+    <!-- Title -->
+    <h1 th:text="${service.name()} + ' Massage'"></h1>
+
+    <!-- Your original Description (unchanged) -->
     <div class="details">
         <p th:switch="${service.name()}">
             <span th:case="'CLASSIC'">
@@ -168,8 +120,10 @@
         </p>
     </div>
 
+    <!-- WHO FOR -->
     <div class="who-for">
         <h3>Who is this massage for?</h3>
+
         <p th:switch="${service.name()}">
             <span th:case="'CLASSIC'">
                 Perfect for individuals seeking relaxation and stress prevention — great if you want to unwind after a long week or maintain balance in your body.
@@ -204,19 +158,25 @@
         </p>
     </div>
 
-    <div class="info-section">
+    <!-- Duration / Price -->
+    <div class="info-section mt-4">
         <p><strong>Duration:</strong> <span th:text="${service.durationMinutes}"></span> minutes</p>
         <p><strong>Price:</strong> €<span th:text="${service.basePrice}"></span></p>
     </div>
 
-    <a th:href="@{/bookings}" class="book-btn">Book Now</a>
+    <!-- Book -->
+    <a th:href="@{/bookings/new}" class="book-btn">
+        <i class="fas fa-calendar-plus me-2"></i>Book Now
+    </a>
+
     <br>
     <a th:href="@{/services}" class="back-link">← Back to Services</a>
+
 </main>
 
-<footer>
-    <p>&copy; 2025 Healing Touch. All rights reserved.</p>
-</footer>
+<!-- ✅ Use real footer -->
+<div th:replace="~{fragments/footer :: footer}"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

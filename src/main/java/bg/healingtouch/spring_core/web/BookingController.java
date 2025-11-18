@@ -1,15 +1,18 @@
 package bg.healingtouch.spring_core.web;
 
-import bg.healingtouch.spring_core.booking.model.Booking;
+import bg.healingtouch.spring_core.booking.model.MassageType;
 import bg.healingtouch.spring_core.booking.service.BookingService;
+import bg.healingtouch.spring_core.security.AuthenticationMetadata;
 import bg.healingtouch.spring_core.therapist.service.TherapistService;
 import bg.healingtouch.spring_core.web.dto.BookingCreateDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -26,11 +29,15 @@ public class BookingController {
 
     @GetMapping("/new")
     public String showCreateForm(Model model) {
+
         if (!model.containsAttribute("booking")) {
             model.addAttribute("booking", new BookingCreateDto());
+            model.addAttribute("org.springframework.validation.BindingResult.booking",
+                    new BeanPropertyBindingResult(new BookingCreateDto(), "booking"));
         }
 
         model.addAttribute("therapists", therapistService.findAllActiveTherapists());
+        model.addAttribute("massageTypes", MassageType.values());
 
         return "bookings/create";
     }
@@ -44,50 +51,81 @@ public class BookingController {
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("booking", bookingDto);
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.booking", bindingResult);
-
             return "redirect:/bookings/new";
         }
 
-        bookingService.createBooking(bookingDto, userDetails.getUsername());
-        redirectAttributes.addFlashAttribute("success", "Booking requested successfully!");
-        return "redirect:/bookings/my";
+        try {
+            AuthenticationMetadata auth = (AuthenticationMetadata) userDetails;
+            UUID userId = auth.getUserId();
+
+            bookingService.createBooking(bookingDto, userId);
+            redirectAttributes.addFlashAttribute("success", "Your booking request has been submitted successfully!");
+            return "redirect:/bookings/my";
+
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "An error occurred while creating your booking. Please try again.");
+            return "redirect:/bookings/new";
+        }
     }
 
-    // Client Bookings VIEW
     @GetMapping("/my")
-    public String viewMyBookings(@AuthenticationPrincipal UserDetails userDetails, Model model) {
-        model.addAttribute("myBookings", bookingService.getBookingsForUser(userDetails.getUsername()));
-        return "booking/my-bookings";
+    @PreAuthorize("isAuthenticated()")
+    public String viewMyBookings(
+            @AuthenticationPrincipal UserDetails userDetails,
+            Model model,
+            @ModelAttribute("success") String success,
+            @ModelAttribute("error") String error) {
+
+        AuthenticationMetadata auth = (AuthenticationMetadata) userDetails;
+        UUID userId = auth.getUserId();
+
+        model.addAttribute("myBookings", bookingService.getBookingsForUser(userId));
+
+        if (success != null && !success.isBlank()) {
+            model.addAttribute("success", success);
+        }
+        if (error != null && !error.isBlank()) {
+            model.addAttribute("error", error);
+        }
+
+        return "bookings/my-bookings";
     }
 
-    //Therapist Bookings View
+    // Therapist Bookings View
+    @PreAuthorize("hasRole('THERAPIST')")
     @GetMapping("/therapist")
     public String viewTherapistBookings(@AuthenticationPrincipal UserDetails userDetails, Model model) {
         model.addAttribute("therapistBookings", bookingService.getBookingsForTherapist(userDetails.getUsername()));
         return "bookings/therapist-bookings";
     }
 
+    // helper
+    @GetMapping
+    public String redirectToNewBooking() {
+        return "redirect:/bookings/new";
+    }
+
     @PostMapping("/{id}/cancel")
-    public String cancelBooking(@PathVariable("id") String bookingId,
+    public String cancelBooking(@PathVariable UUID id,
                                 @AuthenticationPrincipal UserDetails userDetails,
                                 RedirectAttributes redirectAttributes) {
-        bookingService.cancelBooking(UUID.fromString(bookingId), userDetails.getUsername());
+        bookingService.cancelBooking(id, userDetails.getUsername());
         redirectAttributes.addFlashAttribute("success", "Booking canceled successfully!");
         return "redirect:/bookings/my";
     }
 
-    // APPROVE and DECLINE logic
+    @PreAuthorize("hasRole('THERAPIST')")
     @PostMapping("/{id}/approve")
-    public String approveBooking(@PathVariable("id") UUID bookingId,
+    public String approveBooking(@PathVariable UUID id,
                                  @AuthenticationPrincipal UserDetails userDetails,
                                  RedirectAttributes redirectAttributes) {
         try {
-            bookingService.approveBooking(bookingId, userDetails.getUsername());
+            bookingService.approveBooking(id, userDetails.getUsername());
             redirectAttributes.addFlashAttribute("success", "Booking approved successfully!");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
-        return "redirect:/therapist/bookings";
+        return "redirect:/bookings/therapist";
     }
 
     @PostMapping("/{id}/decline")
@@ -100,7 +138,7 @@ public class BookingController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
-        return "redirect:/therapist/bookings";
+        return "redirect:/bookings/therapist";
     }
 
     @PostMapping("/{id}/complete")
@@ -113,8 +151,6 @@ public class BookingController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
-        return "redirect:/therapist/bookings";
+        return "redirect:/bookings/therapist";
     }
-
-
 }

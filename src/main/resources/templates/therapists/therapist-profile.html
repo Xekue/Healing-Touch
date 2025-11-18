@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${therapist.firstName + ' ' + therapist.lastName + ' | HealingTouch'}">Therapist Profile</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- AOS Scroll Animations -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <!-- ✨ Updated Theme CSS (Matches Entire Website) -->
+    <style>
+        :root {
+            --spa-green: #6b8e6b;
+            --spa-green-dark: #4a7c59;
+            --spa-beige: #f5f5dc;
+            --spa-cream: #faf5e6;
+            --spa-cream-light: #fffef7;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--spa-cream-light) 0%, var(--spa-beige) 50%, #fff8e7 100%);
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            min-height: 100vh;
+        }
+
+        main {
+            padding: 3rem 1rem;
+        }
+
+        .profile-wrapper {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .profile-card {
+            background: linear-gradient(135deg, #ffffff 0%, var(--spa-cream) 100%);
+            border-radius: 22px;
+            padding: 3rem;
+            border: 1px solid rgba(107, 142, 107, 0.25);
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.07);
+        }
+
+        /* PROFILE HEADER */
+        .profile-image {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid var(--spa-green);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.18);
+        }
+
+        .profile-name {
+            color: var(--spa-green-dark);
+            font-weight: 700;
+            font-size: 2.1rem;
+        }
+
+        .profile-title {
+            color: #666;
+            font-size: 1.2rem;
+        }
+
+        .soft-divider {
+            width: 80px;
+            height: 3px;
+            background: var(--spa-green);
+            opacity: 0.25;
+            border-radius: 10px;
+        }
+
+        .stats-row {
+            margin-top: 1rem;
+        }
+
+        .stat-pill {
+            background: rgba(107, 142, 107, 0.15);
+            padding: 0.45rem 1rem;
+            border-radius: 30px;
+            font-weight: 600;
+            color: var(--spa-green-dark);
+            margin: 0.25rem;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .stat-pill i {
+            margin-right: 6px;
+        }
+
+        /* SECTION CARDS */
+        .profile-section {
+            background: linear-gradient(135deg, white 0%, var(--spa-cream-light) 100%);
+            padding: 1.8rem;
+            border-radius: 16px;
+            border: 1px solid rgba(74, 124, 89, 0.18);
+            margin-bottom: 1.6rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .section-title {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--spa-green-dark);
+            margin-bottom: 1rem;
+        }
+
+        /* SKILLS / SPECIALTIES */
+        .badge-skill {
+            display: inline-block;
+            background: rgba(107, 142, 107, 0.15);
+            padding: 0.45rem 1rem;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            color: var(--spa-green-dark);
+            margin: 0.25rem;
+        }
+
+        /* SIDEBAR */
+        .sidebar-card {
+            background: linear-gradient(135deg, var(--spa-cream) 0%, var(--spa-beige) 100%);
+            border-radius: 18px;
+            padding: 2rem;
+            border: 1px solid rgba(74, 124, 89, 0.25);
+            box-shadow: 0 5px 18px rgba(0, 0, 0, 0.06);
+        }
+
+        .divider-line {
+            height: 1px;
+            width: 100%;
+            background: rgba(107, 142, 107, 0.25);
+            margin: 1.2rem 0;
+        }
+
+        /* REVIEWS */
+        .review-card {
+            background: var(--spa-cream-light);
+            border-radius: 14px;
+            padding: 1rem 1.2rem;
+            border: 1px solid rgba(107, 142, 107, 0.18);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
+            margin-bottom: 1rem;
+        }
+
+        .review-meta {
+            font-size: 0.85rem;
+            color: #777;
+        }
+
+        .no-reviews-box {
+            border: 2px dashed rgba(107, 142, 107, 0.3);
+            background: #fafefb;
+            padding: 1rem;
+            border-radius: 12px;
+        }
+
+        .review-login-box {
+            background: #fff8e6;
+            border: 1px solid #e6d5a6;
+            padding: 1rem;
+            border-radius: 10px;
+        }
+
+        /* REVIEW TEXTAREA FIX */
+        .review-textarea {
+            resize: none !important;
+            border-radius: 12px;
+            border: 2px solid rgba(107, 142, 107, 0.25);
+            padding: 1rem;
+            background: white;
+            outline: none;
+            width: 100%;
+            max-width: 100% !important;
+            display: block;
+            transition: border-color .2s ease;
+        }
+
+        .review-textarea:focus {
+            border-color: var(--spa-green);
+            box-shadow: 0 0 0 .15rem rgba(107, 142, 107, 0.25);
+        }
+
+        /* STAR INPUT */
+        .star-rating {
+            direction: rtl;
+            display: inline-flex;
+            gap: 5px;
+        }
+
+        .star-rating input {
+            display: none;
+        }
+
+        .star-rating label {
+            font-size: 2rem;
+            cursor: pointer;
+            color: #ccc;
+            transition: color .2s ease;
+        }
+
+        /* Hover effect */
+        .star-rating label:hover,
+        .star-rating label:hover ~ label {
+            color: #e0c682;
+        }
+
+        /* Selected stars */
+        .star-rating input:checked ~ label {
+            color: #e0c682;
+        }
+
+        /* BUTTON */
+        .btn-primary-green {
+            background: linear-gradient(135deg, var(--spa-green), var(--spa-green-dark));
+            padding: .9rem 1.6rem;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-weight: 700;
+            transition: .2s ease;
+        }
+
+        .btn-primary-green:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(74, 124, 89, 0.30);
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div th:replace="~{fragments/header :: header}"></div>
+
+<main>
+    <div class="profile-wrapper">
+
+        <div class="profile-card" data-aos="fade-up">
+
+            <!-- HEADER TOP -->
+            <div class="text-center mb-4">
+
+                <img class="profile-image"
+                     th:if="${therapist.profilePicture != null}"
+                     th:src="@{${therapist.profilePicture}}"
+                     th:alt="${therapist.firstName + ' ' + therapist.lastName}"/>
+
+                <img class="profile-image"
+                     th:if="${therapist.profilePicture == null}"
+                     th:src="@{/images/default-therapist.png}"
+                     th:alt="${therapist.firstName + ' ' + therapist.lastName}"/>
+
+                <h1 class="profile-name mt-3" th:text="${therapist.firstName + ' ' + therapist.lastName}"></h1>
+
+                <p class="profile-title"
+                   th:text="${therapist.title != null ? therapist.title : 'Certified Massage Therapist'}"></p>
+
+                <!-- Soft divider instead of location -->
+                <div class="soft-divider mx-auto my-3"></div>
+
+                <!-- STATS -->
+                <div class="stats-row">
+                    <span class="stat-pill">
+                        <i class="fas fa-briefcase"></i>
+                        <strong th:text="${therapist.experienceYears}"></strong> yrs
+                    </span>
+
+                    <span class="stat-pill">
+                        <i class="fas fa-star"></i>
+                        <strong th:text="${averageRating}"></strong> / 5 (<span th:text="${reviewCount}"></span>)
+                    </span>
+
+                    <span class="stat-pill">
+                        <i class="fas fa-spa"></i>
+                        <strong th:text="${therapist.totalSessions}"></strong> sessions
+                    </span>
+
+                    <span class="stat-pill" th:if="${therapist.hourlyRate != null}">
+                        <i class="fas fa-euro-sign"></i>
+                        from <strong th:text="${therapist.hourlyRate}"></strong> / hour
+                    </span>
+                </div>
+            </div>
+
+            <!-- GRID -->
+            <div class="row g-4">
+
+                <!-- LEFT -->
+                <div class="col-lg-8">
+
+                    <!-- ABOUT -->
+                    <section class="profile-section" data-aos="fade-up">
+                        <h2 class="section-title"><i class="fas fa-user"></i> About</h2>
+                        <p th:text="${therapist.bio != null ? therapist.bio :
+                        'Professional massage therapist dedicated to providing exceptional wellness services.'}"></p>
+                    </section>
+
+                    <!-- SKILLS -->
+                    <section class="profile-section" th:if="${therapist.skills}" data-aos="fade-up">
+                        <h2 class="section-title"><i class="fas fa-hands"></i> Skills</h2>
+                        <span class="badge-skill" th:each="s : ${therapist.skills}" th:text="${s}"></span>
+                    </section>
+
+                    <!-- SPECIALTIES -->
+                    <section class="profile-section" th:if="${therapist.specialties}" data-aos="fade-up">
+                        <h2 class="section-title"><i class="fas fa-star"></i> Specialties</h2>
+                        <span class="badge-skill" th:each="s : ${therapist.specialties}" th:text="${s}"></span>
+                    </section>
+
+                    <!-- CERTIFICATIONS -->
+                    <section class="profile-section" th:if="${therapist.certifications}" data-aos="fade-up">
+                        <h2 class="section-title"><i class="fas fa-certificate"></i> Certifications</h2>
+                        <ul class="list-group">
+                            <li class="list-group-item" th:each="c : ${therapist.certifications}" th:text="${c}"></li>
+                        </ul>
+                    </section>
+
+                    <!-- REVIEWS -->
+                    <section class="profile-section" data-aos="fade-up">
+                        <h2 class="section-title">
+                            <i class="fas fa-comments"></i> Client Reviews
+                            <span class="badge bg-secondary ms-1" th:text="${reviewCount}"></span>
+                        </h2>
+
+                        <!-- Existing reviews -->
+                        <div th:if="${reviews != null and !reviews.isEmpty()}">
+                            <div class="review-card" th:each="r : ${reviews}">
+                                <strong th:text="${r.reviewerName}"></strong>
+                                <span class="review-meta"
+                                      th:text="${#temporals.format(r.createdOn,'MMM dd, yyyy')}"></span>
+
+                                <div class="review-rating mt-1">
+                                    <th:block th:each="i : ${#numbers.sequence(1,5)}">
+                                        <i th:class="${i <= r.rating} ? 'fas fa-star text-warning' : 'far fa-star text-warning'"></i>
+                                    </th:block>
+                                </div>
+
+                                <p class="mt-2" th:text="${r.comment}"></p>
+                            </div>
+                        </div>
+
+                        <!-- No reviews -->
+                        <div th:if="${reviews == null or reviews.isEmpty()}" class="no-reviews-box text-center">
+                            <i class="fas fa-comment-slash fa-2x mb-2"></i>
+                            <p>No reviews yet. Be the first!</p>
+                        </div>
+
+                        <!-- Not logged in -->
+                        <div th:if="${!loggedIn}" class="review-login-box mt-3">
+                            Want to leave a review?
+                            <a th:href="@{/login}">Log in</a> or
+                            <a th:href="@{/register}">Register</a>.
+                        </div>
+
+                        <!-- Logged in: review form -->
+                        <div th:if="${loggedIn}" class="mt-4">
+                            <h3 class="section-title"><i class="fas fa-pen"></i> Leave a Review</h3>
+
+                            <form method="post" th:action="@{'/therapists/' + ${therapist.id} + '/review'}">
+
+                                <div class="star-rating mb-3">
+                                    <input type="radio" id="star5" name="rating" value="5">
+                                    <label for="star5" title="5 stars">★</label>
+
+                                    <input type="radio" id="star4" name="rating" value="4">
+                                    <label for="star4" title="4 stars">★</label>
+
+                                    <input type="radio" id="star3" name="rating" value="3">
+                                    <label for="star3" title="3 stars">★</label>
+
+                                    <input type="radio" id="star2" name="rating" value="2">
+                                    <label for="star2" title="2 stars">★</label>
+
+                                    <input type="radio" id="star1" name="rating" value="1">
+                                    <label for="star1" title="1 star">★</label>
+                                </div>
+
+
+                                <textarea name="comment" rows="5"
+                                          class="review-textarea mb-3 w-100"
+                                          placeholder="Share your experience..."
+                                          required></textarea>
+
+
+                                <div class="text-end">
+                                    <button type="submit" class="btn-primary-green mt-2">
+                                        <i class="fas fa-paper-plane"></i> Submit Review
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                    </section>
+
+                </div>
+
+                <!-- SIDEBAR -->
+                <div class="col-lg-4">
+                    <section class="sidebar-card" data-aos="fade-left">
+                        <h2 class="section-title"><i class="fas fa-info-circle"></i> Contact & Booking</h2>
+
+                        <p><strong>Service Area:</strong><br>
+                            <span th:text="${therapist.location}"></span>
+                        </p>
+
+                        <p><strong>Languages:</strong><br>
+                            <span th:text="${#strings.listJoin(therapist.languages, ', ')}"></span>
+                        </p>
+
+                        <p><strong>Availability:</strong><br>
+                            <span th:text="${therapist.availability}"></span>
+                        </p>
+
+                        <div class="divider-line"></div>
+
+                        <a class="btn-primary-green w-100 mt-2"
+                           th:href="@{/bookings/new(therapistId=${therapist.id})}">
+                            <i class="fas fa-calendar-check"></i> Book Appointment
+                        </a>
+                    </section>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- FOOTER -->
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    AOS.init({
+        duration: 800,
+        offset: 60,
+        once: true
+    });
+</script>
+
+</body>
+</html>

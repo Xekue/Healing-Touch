@@ -9,8 +9,6 @@ import bg.healingtouch.spring_core.user.repository.UserRepository;
 import bg.healingtouch.spring_core.web.dto.RegisterDto;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,9 +33,13 @@ public class UserService implements UserDetailsService {
 
 
     @Transactional
-    public User register(RegisterDto dto) {
+    public User registerNewUser(RegisterDto dto) {
+        if (userRepository.existsByUsername(dto.getUsername())) {
+            throw new IllegalArgumentException("Username is already taken. Please choose another.");
+        }
+
         if (userRepository.existsByEmail(dto.getEmail())) {
-            throw new IllegalArgumentException("Email already registered: " + dto.getEmail());
+            throw new IllegalArgumentException("Email is already registered. Please use a different one.");
         }
 
         User user = new User();
@@ -51,7 +53,9 @@ public class UserService implements UserDetailsService {
         user.setCreatedOn(LocalDateTime.now());
         user.setUpdatedOn(LocalDateTime.now());
 
-        return userRepository.save(user);
+        User saved = userRepository.save(user);
+        log.info("User '{}' registered successfully.", saved.getUsername());
+        return saved;
     }
 
     public User getById(UUID userId) {
