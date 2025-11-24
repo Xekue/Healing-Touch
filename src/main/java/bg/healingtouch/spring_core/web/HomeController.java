@@ -98,11 +98,6 @@ public class HomeController {
         return "profile";
     }
 
-    @GetMapping("/contact")
-    public String showContactPage() {
-        return "contact";
-    }
-
     @GetMapping("/about")
     public String showAboutPage() {
         return "about";

@@ -5,9 +5,13 @@
 <body>
 
 <header th:fragment="header">
+
+    <!-- ADMIN MODE CLASS ADDED ONLY FOR ADMINS -->
     <nav class="navbar navbar-expand-lg navbar-light shadow-sm"
+         th:classappend="${#authorization.expression('hasRole(''ADMIN'')')} ? ' admin-mode' : ''"
          style="background: linear-gradient(135deg, #faf5e6, #f5f5dc);
                 border-bottom: 2px solid #d8cfc0;">
+
         <div class="container">
 
             <!-- Logo -->
@@ -24,10 +28,10 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
 
-            <!-- Navbar Links -->
             <div class="collapse navbar-collapse" id="navbarNav">
 
-                <ul class="navbar-nav ms-auto align-items-lg-center">
+                <!-- FIX: Prevent wrapping, keep everything on one row -->
+                <ul class="navbar-nav ms-auto align-items-lg-center flex-nowrap gap-2">
 
                     <!-- PUBLIC LINKS -->
                     <li class="nav-item">
@@ -60,69 +64,62 @@
                         </a>
                     </li>
 
+                    <!-- BOOK A SESSION -->
+                    <li class="nav-item">
 
-                    <!-- MAIN CTA: Book a Session -->
-                    <li class="nav-item ms-lg-3">
+                        <!-- AUTHENTICATED -->
                         <a class="nav-link fw-semibold"
                            th:href="@{/bookings/new}"
                            sec:authorize="isAuthenticated()"
-                           style="padding:8px 18px;
-                                  border-radius:20px;
-                                  border:2px solid #4a7c59;
-                                  color:#4a7c59;">
-                            <i class="fas fa-calendar-plus me-1"></i>
-                            Book a Session
+                           style="padding:6px 14px; border-radius:20px; border:2px solid #4a7c59; color:#4a7c59;">
+                            <i class="fas fa-calendar-plus me-1"></i> Book a Session
                         </a>
 
-                        <!-- When user is not logged in -->
+                        <!-- ANONYMOUS -->
                         <a class="nav-link fw-semibold"
                            th:href="@{/login}"
                            sec:authorize="isAnonymous()"
-                           style="padding:8px 18px;
-                                  border-radius:20px;
-                                  border:2px solid #4a7c59;
-                                  color:#4a7c59;">
+                           style="padding:6px 14px; border-radius:20px; border:2px solid #4a7c59; color:#4a7c59;">
                             <i class="fas fa-calendar-plus me-1"></i> Book a Session
                         </a>
                     </li>
 
-
-                    <!-- MY BOOKINGS (authenticated only) -->
+                    <!-- MY BOOKINGS (Dynamic: User vs Therapist) -->
                     <li class="nav-item" sec:authorize="isAuthenticated()">
-                        <a class="nav-link" th:href="@{/bookings/my}">
-                            <i class="fas fa-calendar-check me-1"></i>
-                            My Bookings
+                        <a class="nav-link"
+                           th:href="${#authorization.expression('hasRole(''THERAPIST'')') ?
+                 '/bookings/therapist' :
+                 '/bookings/my'}">
+                            <i class="fas fa-calendar-check me-1"></i> My Bookings
                         </a>
                     </li>
 
-
                     <!-- ADMIN DASHBOARD -->
                     <li class="nav-item" sec:authorize="hasRole('ADMIN')">
-                        <a class="nav-link fw-semibold" th:href="@{/admin/dashboard}">
+                        <a class="nav-link fw-semibold admin-nav-compressed"
+                           th:href="@{/admin/dashboard}">
                             <i class="fas fa-tools me-1"></i> Admin Dashboard
                         </a>
                     </li>
 
-
-                    <!-- LOGIN & REGISTER (anonymous) -->
+                    <!-- LOGIN -->
                     <li class="nav-item" sec:authorize="isAnonymous()">
                         <a class="nav-link" th:href="@{/login}">
                             <i class="fas fa-sign-in-alt me-1"></i> Login
                         </a>
                     </li>
 
+                    <!-- REGISTER -->
                     <li class="nav-item" sec:authorize="isAnonymous()">
                         <a class="nav-link" th:href="@{/register}">
                             <i class="fas fa-user-plus me-1"></i> Register
                         </a>
                     </li>
 
-
-                    <!-- USER DROPDOWN (authenticated) -->
+                    <!-- USER DROPDOWN -->
                     <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
                         <a class="nav-link dropdown-toggle"
-                           href="#" id="userDropdown"
-                           role="button"
+                           href="#" id="userDropdown" role="button"
                            data-bs-toggle="dropdown">
                             <i class="fas fa-user-circle me-1"></i>
                             <span th:text="${#authentication.name}">User</span>
@@ -153,10 +150,12 @@
     </nav>
 
     <style>
+        /* Default link styling */
         .nav-link {
             color: #2d5016 !important;
             font-weight: 500;
-            padding: 8px 12px !important;
+            padding: 6px 10px !important;
+            white-space: nowrap;
             transition: 0.2s;
         }
 
@@ -167,6 +166,17 @@
 
         .navbar-brand:hover {
             transform: translateY(-1px);
+        }
+
+        /* ADMIN ONLY → shrink admin-specific items */
+        .admin-mode .admin-nav-compressed {
+            padding: 4px 8px !important;
+            font-size: 0.9rem !important;
+        }
+
+        /* Make spacing tighter in admin mode */
+        .admin-mode .navbar-nav {
+            gap: 0.4rem !important;
         }
     </style>
 

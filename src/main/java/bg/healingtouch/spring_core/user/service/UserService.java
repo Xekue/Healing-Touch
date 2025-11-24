@@ -7,7 +7,6 @@ import bg.healingtouch.spring_core.user.model.User;
 import bg.healingtouch.spring_core.user.model.UserRoles;
 import bg.healingtouch.spring_core.user.repository.UserRepository;
 import bg.healingtouch.spring_core.web.dto.RegisterDto;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -61,11 +60,6 @@ public class UserService implements UserDetailsService {
     public User getById(UUID userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new UsernameNotFoundException("User with id " + userId + " not found"));
-    }
-
-    public User getByEmail(String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new EntityNotFoundException("User not found with email: " + email));
     }
 
     public List<User> getAllUsers() {
@@ -134,25 +128,7 @@ public class UserService implements UserDetailsService {
         return new AuthenticationMetadata(user.getId(), username, user.getPassword(), user.getRole(), user.isActive());
     }
 
-    @Transactional
-    public void promoteToAdmin(UUID userId, UUID performedByAdminId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
-
-        if (user.getRole() == UserRoles.ADMIN) {
-            throw new IllegalStateException("User is already an admin.");
-        }
-
-        user.setRole(UserRoles.ADMIN);
-        user.setUpdatedOn(LocalDateTime.now());
-        userRepository.save(user);
-    }
-
-    public boolean existsByUsername(String username) {
-        return userRepository.existsByUsername(username);
-    }
-
-    public boolean existsByEmail(String email) {
-        return userRepository.existsByEmail(email);
+    public List<User> getAllCustomers() {
+        return userRepository.findAllByRole(UserRoles.CUSTOMER);
     }
 }

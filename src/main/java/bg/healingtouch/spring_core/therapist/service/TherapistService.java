@@ -203,4 +203,8 @@ public class TherapistService {
             return therapistRepository.findById(addTherapist(dto).getId()).orElseThrow();
         });
     }
+
+    public Optional<Therapist> findByUserId(UUID userId) {
+        return therapistRepository.findByUserId(userId);
+    }
 }

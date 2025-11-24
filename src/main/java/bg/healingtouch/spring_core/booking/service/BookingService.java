@@ -4,9 +4,7 @@ import bg.healingtouch.spring_core.booking.model.Booking;
 import bg.healingtouch.spring_core.booking.model.BookingStatus;
 import bg.healingtouch.spring_core.booking.model.PaymentStatus;
 import bg.healingtouch.spring_core.booking.repository.BookingRepository;
-import bg.healingtouch.spring_core.client.ReviewClient;
-import bg.healingtouch.spring_core.client.dto.CreateReviewDto;
-import bg.healingtouch.spring_core.client.dto.ReviewResponseDto;
+import bg.healingtouch.spring_core.notification.service.EmailService;
 import bg.healingtouch.spring_core.therapist.model.Therapist;
 import bg.healingtouch.spring_core.therapist.repository.TherapistRepository;
 import bg.healingtouch.spring_core.therapist.service.TherapistService;
@@ -18,33 +16,32 @@ import bg.healingtouch.spring_core.web.dto.BookingResponseDto;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BookingService {
 
     private final BookingRepository bookingRepository;
     private final TherapistRepository therapistRepository;
     private final UserRepository userRepository;
-    private final ReviewClient reviewClient;
     private final UserService userService;
     private final TherapistService therapistService;
+    private final EmailService emailService;
 
-    private static final Logger log = LoggerFactory.getLogger(BookingService.class);
 
     @Transactional
     public BookingResponseDto createBooking(BookingCreateDto dto, UUID customerId) {
 
         User customer = userService.getById(customerId);
-
         Therapist therapist = therapistService.getById(dto.getTherapistId());
 
         BigDecimal price = calculatePrice(dto.getDurationMinutes());
@@ -65,19 +62,9 @@ public class BookingService {
 
         bookingRepository.save(booking);
 
-        return new BookingResponseDto(
-                booking.getId(),
-                customer.getId(),
-                therapist.getId(),
-                therapist.getFirstName() + " " + therapist.getLastName(),
-                booking.getMassageType(),
-                booking.getStartTime(),
-                booking.getEndTime(),
-                booking.getBookingStatus(),
-                booking.getPaymentStatus(),
-                booking.getPrice()
-        );
+        return mapToResponseDto(booking);
     }
+
 
     private BigDecimal calculatePrice(Integer duration) {
         if (duration == null) return BigDecimal.ZERO;
@@ -91,32 +78,52 @@ public class BookingService {
         };
     }
 
+
     private BookingResponseDto mapToResponseDto(Booking booking) {
+
+        String customerName =
+                booking.getCustomer().getFirstName() + " " + booking.getCustomer().getLastName();
+
+        String therapistName =
+                booking.getTherapist().getUser().getFirstName() + " " +
+                        booking.getTherapist().getUser().getLastName();
+
         return new BookingResponseDto(
                 booking.getId(),
                 booking.getCustomer().getId(),
+                customerName,
                 booking.getTherapist().getId(),
-                booking.getTherapist().getUser().getFirstName() + " " +
-                        booking.getTherapist().getUser().getLastName(),
+                therapistName,
                 booking.getMassageType(),
                 booking.getStartTime(),
                 booking.getEndTime(),
+                booking.getDurationMinutes(),
+                booking.getNotes(),
                 booking.getBookingStatus(),
                 booking.getPaymentStatus(),
                 booking.getPrice()
         );
     }
 
-    public List<BookingResponseDto> getBookingsForUser(UUID userId) {
 
+    public List<BookingResponseDto> getBookingsForUser(UUID userId) {
         return bookingRepository.findByCustomerId(userId)
                 .stream()
                 .map(this::mapToResponseDto)
                 .toList();
     }
 
+
+    private void assertTherapistOwnership(Booking booking, String therapistUsername) {
+        if (!booking.getTherapist().getUser().getUsername().equals(therapistUsername)) {
+            throw new SecurityException("You can only manage your own bookings.");
+        }
+    }
+
+
     @Transactional
     public void cancelBooking(UUID bookingId, String username) {
+
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new EntityNotFoundException("Booking not found"));
 
@@ -133,97 +140,99 @@ public class BookingService {
         }
 
         booking.setBookingStatus(BookingStatus.CANCELLED);
-        bookingRepository.save(booking);
-    }
-
-    @Transactional
-    public ReviewResponseDto submitReview(UUID bookingId, String username, int rating, String comment) {
-        User customer = userRepository.findByUsername(username)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
-
-        Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new EntityNotFoundException("Booking not found"));
-
-        if (!booking.getCustomer().getId().equals(customer.getId())) {
-            throw new IllegalStateException("You can only review your own bookings");
-        }
-
-        CreateReviewDto dto = new CreateReviewDto();
-        dto.setBookingId(booking.getId());
-        dto.setTherapistId(booking.getTherapist().getId());
-        dto.setCustomerId(customer.getId());
-        dto.setRating(rating);
-        dto.setComment(comment);
-
-        return reviewClient.createReview(dto);
     }
 
 
     @Transactional
     public void approveBooking(UUID bookingId, String therapistUsername) {
+
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new EntityNotFoundException("Booking not found"));
 
-        if (!booking.getTherapist().getUser().getUsername().equals(therapistUsername)) {
-            throw new SecurityException("You can only approve your own bookings.");
-        }
+        assertTherapistOwnership(booking, therapistUsername);
 
         if (booking.getBookingStatus() != BookingStatus.PENDING) {
             throw new IllegalStateException("Only pending bookings can be approved.");
         }
 
         booking.setBookingStatus(BookingStatus.CONFIRMED);
-        bookingRepository.save(booking);
-        mapToResponseDto(booking);
+
+        emailService.send(
+                booking.getCustomer().getEmail(),
+                "Your booking is confirmed!",
+                "Your therapist has approved your booking scheduled for: " +
+                        booking.getStartTime()
+        );
     }
+
 
     @Transactional
     public void declineBooking(UUID bookingId, String therapistUsername) {
+
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new EntityNotFoundException("Booking not found"));
 
-        if (!booking.getTherapist().getUser().getUsername().equals(therapistUsername)) {
-            throw new SecurityException("You can only decline your own bookings.");
-        }
+        assertTherapistOwnership(booking, therapistUsername);
 
         if (booking.getBookingStatus() != BookingStatus.PENDING) {
             throw new IllegalStateException("Only pending bookings can be declined.");
         }
 
         booking.setBookingStatus(BookingStatus.DECLINED);
-        bookingRepository.save(booking);
-        mapToResponseDto(booking);
-    }
 
-    public List<BookingResponseDto> getBookingsForTherapist(String username) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
-
-        Therapist therapist = therapistRepository.findByUserIdAndDeletedFalse(user.getId())
-                .orElseThrow(() -> new EntityNotFoundException("Therapist not found or is deleted"));
-
-        return bookingRepository.findByTherapistId(therapist.getId())
-                .stream()
-                .map(this::mapToResponseDto)
-                .toList();
+        emailService.send(
+                booking.getCustomer().getEmail(),
+                "Your booking was declined",
+                "Unfortunately, your therapist declined your session request."
+        );
     }
 
     @Transactional
     public void completeBooking(UUID bookingId, String therapistUsername) {
+
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new EntityNotFoundException("Booking not found"));
 
-        if (!booking.getTherapist().getUser().getUsername().equals(therapistUsername)) {
-            throw new SecurityException("You can only complete your own bookings.");
-        }
+        assertTherapistOwnership(booking, therapistUsername);
 
         if (booking.getBookingStatus() != BookingStatus.CONFIRMED) {
             throw new IllegalStateException("Only confirmed bookings can be marked as completed.");
         }
 
         booking.setBookingStatus(BookingStatus.COMPLETED);
-        booking.setUpdatedOn(LocalDateTime.now());
         booking.setCompletedOn(LocalDateTime.now());
-        bookingRepository.save(booking);
+
+        emailService.send(
+                booking.getCustomer().getEmail(),
+                "Your session is completed",
+                "Thank you for visiting HealingTouch! We hope you enjoyed your session."
+        );
+    }
+
+    public List<BookingResponseDto> getAllBookingsFiltered(
+            BookingStatus status,
+            UUID therapistId,
+            UUID customerId
+    ) {
+        return bookingRepository.findAll()
+                .stream()
+                .filter(b -> status == null || b.getBookingStatus() == status)
+                .filter(b -> therapistId == null || b.getTherapist().getId().equals(therapistId))
+                .filter(b -> customerId == null || b.getCustomer().getId().equals(customerId))
+                .sorted(Comparator.comparing(Booking::getStartTime))
+                .map(this::mapToResponseDto)
+                .toList();
+    }
+
+    public List<Booking> getBookingsForTherapist(UUID therapistId) {
+        return bookingRepository.findByTherapistId(therapistId);
+    }
+
+    public List<BookingResponseDto> getTherapistBookingsDto(UUID therapistId) {
+        return bookingRepository.findByTherapistId(therapistId)
+                .stream()
+                .sorted(Comparator.comparing(Booking::getStartTime))
+                .map(this::mapToResponseDto)
+                .toList();
     }
 }

@@ -126,14 +126,14 @@
         <p class="login-subtitle">Welcome back! Please sign in.</p>
 
         <!-- Error Message -->
-        <div th:if="${param.error}" class="alert alert-danger">
-            <i class="fas fa-exclamation-circle me-2"></i>
-            Invalid username or password.
+        <div th:if="${errorMessage != null and !#strings.isEmpty(errorMessage)}"
+             class="alert alert-danger">
+            <span th:text="${errorMessage}"></span>
         </div>
 
         <!-- Success message -->
-        <div th:if="${successMessage}" class="alert alert-success">
-            <i class="fas fa-check-circle me-2"></i>
+        <div th:if="${successMessage != null and !#strings.isEmpty(successMessage)}"
+             class="alert alert-success">
             <span th:text="${successMessage}"></span>
         </div>
 

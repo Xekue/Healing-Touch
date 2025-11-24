@@ -71,13 +71,20 @@ public class BookingController {
     @GetMapping("/my")
     @PreAuthorize("isAuthenticated()")
     public String viewMyBookings(
-            @AuthenticationPrincipal UserDetails userDetails,
+            @AuthenticationPrincipal AuthenticationMetadata auth,
             Model model,
             @ModelAttribute("success") String success,
-            @ModelAttribute("error") String error) {
+            @ModelAttribute("error") String error
+    ) {
 
-        AuthenticationMetadata auth = (AuthenticationMetadata) userDetails;
         UUID userId = auth.getUserId();
+
+        var therapistOpt = therapistService.findByUserId(userId);
+
+        if (therapistOpt.isPresent()) {
+
+            return "redirect:/bookings/therapist";
+        }
 
         model.addAttribute("myBookings", bookingService.getBookingsForUser(userId));
 
@@ -91,15 +98,25 @@ public class BookingController {
         return "bookings/my-bookings";
     }
 
-    // Therapist Bookings View
     @PreAuthorize("hasRole('THERAPIST')")
     @GetMapping("/therapist")
-    public String viewTherapistBookings(@AuthenticationPrincipal UserDetails userDetails, Model model) {
-        model.addAttribute("therapistBookings", bookingService.getBookingsForTherapist(userDetails.getUsername()));
+    public String viewTherapistBookings(
+            @AuthenticationPrincipal AuthenticationMetadata auth,
+            Model model) {
+
+        UUID userId = auth.getUserId();
+
+        UUID therapistId = therapistService
+                .findByUserId(userId)
+                .orElseThrow(() -> new IllegalStateException("Therapist profile not found"))
+                .getId();
+
+        model.addAttribute("therapistBookings",
+                bookingService.getTherapistBookingsDto(therapistId));
+
         return "bookings/therapist-bookings";
     }
 
-    // helper
     @GetMapping
     public String redirectToNewBooking() {
         return "redirect:/bookings/new";

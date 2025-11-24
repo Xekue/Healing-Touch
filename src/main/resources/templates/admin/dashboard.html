@@ -33,12 +33,8 @@
             box-shadow: 0 8px 30px rgba(0,0,0,0.12);
         }
 
-        .page-title {
-            color: var(--spa-green-dark);
-            font-weight: 600;
-        }
+        .page-title { color: var(--spa-green-dark); font-weight: 600; }
 
-        /** BADGES **/
         .role-badge, .status-badge {
             padding: 0.4rem 0.8rem;
             border-radius: 20px;
@@ -46,65 +42,46 @@
             font-weight: 600;
             text-transform: uppercase;
         }
+
         .role-admin { background: #fff3cd; color: #856404; }
         .role-therapist { background: #d1ecf1; color: #0c5460; }
         .role-user { background: #d4edda; color: #155724; }
+
         .status-deleted { background: #e74c3c; color: #fff; }
 
-        /** BUTTONS **/
-        .btn-sm { padding: 0.35rem 0.75rem; font-size: 0.875rem; border-radius: 20px; font-weight: 600; }
+        .btn-sm {
+            padding: 0.35rem 0.75rem;
+            font-size: 0.875rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
         .btn-therapist { background: #87a96b; color: #fff; }
         .btn-admin { background: #f0ad4e; color: #fff; }
         .btn-demote { background: #6c757d; color: white; }
         .btn-delete { background: #dc3545; color: white; }
 
-        /** TOGGLE SWITCH **/
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 25px;
-        }
+        .switch { position: relative; display: inline-block; width: 50px; height: 25px; }
         .switch input { opacity: 0; width: 0; height: 0; }
+
         .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 25px;
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc; transition: .4s; border-radius: 25px;
         }
         .slider:before {
-            position: absolute;
-            content: "";
-            height: 19px;
-            width: 19px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
+            position: absolute; content: ""; height: 19px; width: 19px;
+            left: 3px; bottom: 3px; background-color: white;
+            transition: .4s; border-radius: 50%;
         }
         input:checked + .slider { background-color: var(--spa-green); }
         input:checked + .slider:before { transform: translateX(25px); }
 
-        /** EMPTY STATE **/
-        .empty-state {
-            text-align: center;
-            padding: 3rem;
-            color: #777;
-        }
+        .empty-state { text-align: center; padding: 3rem; color: #777; }
 
-        /** SOFT-DELETED LOOK **/
         .deleted-row {
-            opacity: 0.45;
-            filter: grayscale(60%);
-            pointer-events: none; /* prevents toggles/actions */
+            opacity: 0.45; filter: grayscale(60%); pointer-events: none;
         }
-        .deleted-row td {
-            text-decoration: line-through;
-            color: #a0a0a0 !important;
-        }
+        .deleted-row td { text-decoration: line-through; color: #a0a0a0 !important; }
     </style>
 </head>
 <body>
@@ -118,7 +95,7 @@
             <h1 class="page-title mb-3">
                 <i class="fas fa-tachometer-alt me-2"></i>Admin Dashboard
             </h1>
-            <p class="text-muted mb-4">Manage users and therapists</p>
+            <p class="text-muted mb-4">Manage users, therapists, and bookings</p>
 
             <!-- TABS -->
             <ul class="nav nav-tabs" id="adminTabs">
@@ -127,9 +104,16 @@
                         <i class="fas fa-users me-2"></i>Users
                     </button>
                 </li>
+
                 <li class="nav-item">
                     <button class="nav-link" data-bs-toggle="tab" data-bs-target="#therapists">
                         <i class="fas fa-user-md me-2"></i>Therapists
+                    </button>
+                </li>
+
+                <li class="nav-item">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#bookings">
+                        <i class="fas fa-calendar-check me-2"></i>Bookings
                     </button>
                 </li>
             </ul>
@@ -179,7 +163,6 @@
 
                                 <td>
                                     <div class="btn-group">
-
                                         <form th:if="${user.role.name() == 'CUSTOMER' and user.id != loggedUserId}"
                                               th:action="@{'/admin/users/' + ${user.id} + '/promote-therapist'}"
                                               method="post">
@@ -203,7 +186,6 @@
                                                 <i class="fas fa-arrow-down me-1"></i>Demote
                                             </button>
                                         </form>
-
                                     </div>
                                 </td>
                             </tr>
@@ -216,11 +198,11 @@
                         <h4>No Users Found</h4>
                         <p>No users exist in the system yet.</p>
                     </div>
+
                 </div>
 
                 <!-- THERAPISTS TAB -->
                 <div class="tab-pane fade" id="therapists">
-
                     <div th:if="${therapists != null and !therapists.isEmpty()}">
                         <table class="table table-hover align-middle">
                             <thead>
@@ -267,7 +249,6 @@
                                         </button>
                                     </form>
                                 </td>
-
                             </tr>
                             </tbody>
                         </table>
@@ -277,6 +258,23 @@
                         <i class="fas fa-user-md fa-3x mb-3"></i>
                         <h4>No Therapists Found</h4>
                         <p>No therapists exist yet.</p>
+                    </div>
+                </div>
+
+                <!-- BOOKINGS TAB -->
+                <div class="tab-pane fade" id="bookings">
+
+                    <div class="text-end mb-3">
+                        <a class="btn btn-success px-4" th:href="@{/admin/bookings}">
+                            <i class="fas fa-external-link-alt me-1"></i>
+                            Open Full Booking Manager
+                        </a>
+                    </div>
+
+                    <div class="empty-state">
+                        <i class="fas fa-calendar-check fa-3x mb-3"></i>
+                        <h4>Booking Overview</h4>
+                        <p>Click the button above to view all bookings with filters.</p>
                     </div>
 
                 </div>

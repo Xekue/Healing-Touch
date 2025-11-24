@@ -3,340 +3,198 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Manage your massage therapy bookings as a therapist at HealingTouch.">
-    <title>My Bookings | HealingTouch - Therapist</title>
-    
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- FontAwesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Custom CSS -->
-    <link th:href="@{/css/style.css}" rel="stylesheet">
-    
+    <title>Therapist Bookings | HealingTouch</title>
+
+    <!-- Bootstrap & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
         :root {
             --spa-green: #6b8e6b;
             --spa-green-dark: #4a7c59;
-            --spa-beige: #f5f5dc;
             --spa-cream: #faf5e6;
-            --spa-sand: #d4c5a0;
+            --spa-beige: #f5f5dc;
+
+            --pending: #fff3cd;
+            --confirmed: #d4edda;
+            --declined: #f8d7da;
+            --cancelled: #fce1e1;
+            --completed: #d1ecf1;
         }
-        
+
         body {
-            background: linear-gradient(135deg, var(--spa-cream) 0%, var(--spa-beige) 50%, #fff8e7 100%);
+            background: linear-gradient(135deg,var(--spa-cream),var(--spa-beige));
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
         }
-        
-        main {
-            flex: 1;
-            padding: 3rem 0;
-        }
-        
-        .page-header {
-            text-align: center;
-            margin-bottom: 3rem;
-        }
-        
+
         .page-title {
-            color: var(--spa-green-dark);
-            font-weight: 600;
+            text-align: center;
+            margin: 2rem 0;
             font-size: 2.5rem;
-            margin-bottom: 0.5rem;
+            color: var(--spa-green-dark);
+            font-weight: 700;
         }
-        
+
         .booking-card {
-            background: white;
-            border-radius: 15px;
+            background: #fff;
             padding: 2rem;
             margin-bottom: 1.5rem;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-            border: 1px solid rgba(107, 142, 107, 0.2);
-            transition: all 0.3s ease;
-        }
-        
-        .booking-card:hover {
-            box-shadow: 0 6px 20px rgba(107, 142, 107, 0.15);
-        }
-        
-        .booking-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: start;
-            margin-bottom: 1.5rem;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-        
-        .booking-info {
-            flex: 1;
-        }
-        
-        .massage-type {
-            color: var(--spa-green-dark);
-            font-weight: 600;
-            font-size: 1.3rem;
-            margin-bottom: 0.5rem;
-        }
-        
-        .booking-details {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-        
-        .detail-item {
-            padding: 0.75rem;
-            background: var(--spa-cream);
-            border-radius: 8px;
-        }
-        
-        .detail-label {
-            color: #666;
-            font-size: 0.85rem;
-            margin-bottom: 0.25rem;
-        }
-        
-        .detail-value {
-            color: var(--spa-green-dark);
-            font-weight: 600;
-        }
-        
-        .status-badge {
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            display: inline-block;
-        }
-        
-        .status-pending {
-            background: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffeaa7;
-        }
-        
-        .status-confirmed {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        
-        .status-cancelled {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        
-        .status-completed {
-            background: #d1ecf1;
-            color: #0c5460;
-            border: 1px solid #bee5eb;
-        }
-        
-        .action-buttons {
-            display: flex;
-            gap: 0.75rem;
-            flex-wrap: wrap;
-        }
-        
-        .btn-approve {
-            background: #28a745;
-            color: white;
-            border: none;
-            padding: 0.5rem 1.5rem;
-            border-radius: 20px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-approve:hover {
-            background: #218838;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3);
-            color: white;
-        }
-        
-        .btn-decline {
-            background: #dc3545;
-            color: white;
-            border: none;
-            padding: 0.5rem 1.5rem;
-            border-radius: 20px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-decline:hover {
-            background: #c82333;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);
-            color: white;
-        }
-        
-        .btn-complete {
-            background: var(--spa-green);
-            color: white;
-            border: none;
-            padding: 0.5rem 1.5rem;
-            border-radius: 20px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-complete:hover {
-            background: var(--spa-green-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(107, 142, 107, 0.3);
-            color: white;
-        }
-        
-        .empty-state {
-            text-align: center;
-            padding: 5rem 2rem;
-            background: white;
             border-radius: 15px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(107,142,107,.2);
+            box-shadow: 0 4px 12px rgba(0,0,0,.07);
+            transition: .2s ease;
         }
-        
-        .empty-state i {
-            font-size: 5rem;
-            color: var(--spa-green);
-            opacity: 0.4;
-            margin-bottom: 1.5rem;
+
+        .booking-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,.1);
         }
-        
-        .empty-state h3 {
-            color: var(--spa-green-dark);
-            margin-bottom: 1rem;
-        }
-        
-        .price {
-            font-size: 1.5rem;
+
+        .status-badge {
+            padding: .5rem 1rem;
+            border-radius: 20px;
+            text-transform: uppercase;
+            font-size: .85rem;
             font-weight: 700;
-            color: var(--spa-green-dark);
         }
+
+        .status-pending { background: var(--pending); color: #856404; }
+        .status-confirmed { background: var(--confirmed); color: #155724; }
+        .status-declined { background: var(--declined); color: #721c24; }
+        .status-cancelled { background: var(--cancelled); color: #7a1f1f; }
+        .status-completed { background: var(--completed); color: #0c5460; }
+
+        .action-btn {
+            border-radius: 25px;
+            padding: .6rem 1.5rem;
+            font-weight: 700;
+            color: #fff;
+            border: none;
+        }
+
+        .approve-btn { background: #28a745; }
+        .decline-btn { background: #dc3545; }
+        .complete-btn { background: var(--spa-green); }
+
+        .approve-btn:hover { background: #1e7e34; }
+        .decline-btn:hover { background: #b52e3a; }
+        .complete-btn:hover { background: var(--spa-green-dark); }
     </style>
 </head>
+
 <body>
-    <!-- Header -->
-    <div th:replace="~{fragments/header :: header}"></div>
-    
-    <main>
-        <div class="container">
-            <!-- Page Header -->
-            <div class="page-header">
-                <h1 class="page-title">
-                    <i class="fas fa-calendar-alt me-2"></i>My Bookings
-                </h1>
-                <p class="text-muted">Manage your scheduled massage therapy sessions</p>
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+<main class="container">
+
+    <h1 class="page-title">
+        <i class="fas fa-calendar-alt me-2"></i>My Bookings
+    </h1>
+
+    <!-- List of bookings -->
+    <div th:if="${therapistBookings != null and !therapistBookings.isEmpty()}">
+
+        <div th:each="booking : ${therapistBookings}" class="booking-card">
+
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-start mb-3">
+
+                <div>
+                    <h4 class="mb-1" th:text="${booking.massageType}">Massage</h4>
+
+                    <span class="status-badge"
+                          th:classappend="' status-' + ${booking.status.name().toLowerCase()}"
+                          th:text="${booking.status}">
+                    </span>
+                </div>
+
+                <h4 class="text-success fw-bold"
+                    th:text="${'$' + booking.price}">
+                </h4>
             </div>
-            
-            <!-- Bookings List -->
-            <div th:if="${therapistBookings != null and !therapistBookings.isEmpty()}">
-                <div class="booking-card" th:each="booking : ${therapistBookings}">
-                    <div class="booking-header">
-                        <div class="booking-info">
-                            <div class="massage-type" th:text="${booking.massageType != null ? booking.massageType : 'Massage Session'}">
-                                Swedish Massage
-                            </div>
-                            <div class="mt-2">
-                                <span class="status-badge" 
-                                      th:classappend="${'status-' + booking.status.toLowerCase()}"
-                                      th:text="${booking.status}">
-                                    PENDING
-                                </span>
-                            </div>
-                        </div>
-                        <div class="text-end">
-                            <div class="price" th:text="${booking.price != null ? '$' + #numbers.formatDecimal(booking.price, 1, 2) : 'N/A'}">
-                                $50.00
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="booking-details">
-                        <div class="detail-item">
-                            <div class="detail-label">
-                                <i class="fas fa-user me-1"></i>Client
-                            </div>
-                            <div class="detail-value">Client ID: <span th:text="${booking.customerId != null ? booking.customerId : 'N/A'}">1</span></div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">
-                                <i class="fas fa-calendar me-1"></i>Date
-                            </div>
-                            <div class="detail-value" th:text="${booking.startTime != null ? #temporals.format(booking.startTime, 'MMM dd, yyyy') : 'N/A'}">
-                                Jan 15, 2024
-                            </div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">
-                                <i class="fas fa-clock me-1"></i>Time
-                            </div>
-                            <div class="detail-value" th:text="${booking.startTime != null ? #temporals.format(booking.startTime, 'hh:mm a') + ' - ' + (booking.endTime != null ? #temporals.format(booking.endTime, 'hh:mm a') : 'N/A') : 'N/A'}">
-                                10:00 AM - 11:00 AM
-                            </div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">
-                                <i class="fas fa-credit-card me-1"></i>Payment
-                            </div>
-                            <div class="detail-value" th:text="${booking.paymentStatus != null ? booking.paymentStatus : 'N/A'}">
-                                PENDING
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Action Buttons -->
-                    <div class="action-buttons">
-                        <!-- PENDING: Approve/Decline -->
-                        <div th:if="${booking.status == 'PENDING'}">
-                            <form th:action="@{'/bookings/' + ${booking.id} + '/approve'}" method="post" style="display: inline;">
-                                <button type="submit" class="btn-approve">
-                                    <i class="fas fa-check me-2"></i>Approve
-                                </button>
-                            </form>
-                            <form th:action="@{'/bookings/' + ${booking.id} + '/decline'}" method="post" style="display: inline;">
-                                <button type="submit" class="btn-decline" onclick="return confirm('Are you sure you want to decline this booking?');">
-                                    <i class="fas fa-times me-2"></i>Decline
-                                </button>
-                            </form>
-                        </div>
-                        
-                        <!-- CONFIRMED: Mark as Completed -->
-                        <div th:if="${booking.status == 'CONFIRMED'}">
-                            <form th:action="@{'/bookings/' + ${booking.id} + '/complete'}" method="post" style="display: inline;">
-                                <button type="submit" class="btn-complete">
-                                    <i class="fas fa-check-circle me-2"></i>Mark as Completed
-                                </button>
-                            </form>
-                        </div>
-                    </div>
+
+            <!-- Details -->
+            <div class="row mb-3">
+
+                <div class="col-md-4">
+                    <p class="mb-1 text-muted"><i class="fas fa-user"></i> Client</p>
+                    <p class="fw-bold" th:text="${booking.customerName}">John Doe</p>
+                </div>
+
+                <div class="col-md-4">
+                    <p class="mb-1 text-muted"><i class="fas fa-calendar"></i> Date</p>
+                    <p class="fw-bold"
+                       th:text="${#temporals.format(booking.startTime,'MMM dd, yyyy')}"></p>
+                </div>
+
+                <div class="col-md-4">
+                    <p class="mb-1 text-muted"><i class="fas fa-clock"></i> Time</p>
+                    <p class="fw-bold"
+                       th:text="${#temporals.format(booking.startTime,'HH:mm') + ' - ' +
+                                #temporals.format(booking.endTime,'HH:mm')}"></p>
                 </div>
             </div>
-            
-            <!-- Empty State -->
-            <div class="empty-state" th:if="${therapistBookings == null or therapistBookings.isEmpty()}">
-                <i class="fas fa-calendar-times"></i>
-                <h3>No Bookings Yet</h3>
-                <p class="text-muted">You don't have any scheduled bookings at the moment.</p>
+
+            <!-- Client Notes -->
+            <div th:if="${booking.notes}" class="alert alert-warning mt-3">
+                <strong><i class="fas fa-sticky-note me-2"></i>Client Notes:</strong>
+                <span th:text="${booking.notes}"></span>
             </div>
+
+            <!-- Pending Actions -->
+            <div th:if="${booking.status.name() == 'PENDING'}" class="d-flex gap-2 mt-3">
+
+                <form th:action="@{'/bookings/' + ${booking.id} + '/approve'}" method="post">
+                    <button class="action-btn approve-btn">
+                        <i class="fas fa-check me-2"></i>Approve
+                    </button>
+                </form>
+
+                <form th:action="@{'/bookings/' + ${booking.id} + '/decline'}" method="post"
+                      onsubmit="return confirm('Are you sure you want to decline this booking?');">
+                    <button class="action-btn decline-btn">
+                        <i class="fas fa-times me-2"></i>Decline
+                    </button>
+                </form>
+            </div>
+
+            <!-- Confirmed Action -->
+            <div th:if="${booking.status.name() == 'CONFIRMED'}" class="mt-3">
+                <form th:action="@{'/bookings/' + ${booking.id} + '/complete'}" method="post">
+                    <button class="action-btn complete-btn">
+                        <i class="fas fa-check-circle me-2"></i>Mark as Completed
+                    </button>
+                </form>
+            </div>
+
+            <!-- No Actions -->
+            <div th:if="${booking.status.name() != 'PENDING'
+                          and booking.status.name() != 'CONFIRMED'}"
+                 class="mt-2 text-muted">
+                <i>*No further actions available for this booking*</i>
+            </div>
+
         </div>
-    </main>
-    
-    <!-- Footer -->
-    <div th:replace="~{fragments/footer :: footer}"></div>
-    
-    <!-- Bootstrap 5 JS Bundle -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    </div>
+
+    <!-- Empty state -->
+    <div th:if="${therapistBookings == null or therapistBookings.isEmpty()}"
+         class="text-center mt-5">
+        <i class="fas fa-calendar-times fa-4x text-muted"></i>
+        <h3 class="mt-3">No Bookings Yet</h3>
+        <p class="text-muted">Clients haven't booked any sessions yet.</p>
+    </div>
+
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>
-

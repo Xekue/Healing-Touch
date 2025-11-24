@@ -1,15 +1,20 @@
 package bg.healingtouch.spring_core.web;
 
 import bg.healingtouch.spring_core.Admin.AdminService;
+import bg.healingtouch.spring_core.booking.model.BookingStatus;
+import bg.healingtouch.spring_core.booking.service.BookingService;
 import bg.healingtouch.spring_core.user.repository.UserRepository;
 import bg.healingtouch.spring_core.therapist.service.TherapistService;
 import bg.healingtouch.spring_core.security.AuthenticationMetadata;
+import bg.healingtouch.spring_core.user.service.UserService;
+import bg.healingtouch.spring_core.web.dto.BookingResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @Controller
@@ -20,6 +25,8 @@ public class AdminController {
     private final UserRepository userRepository;
     private final TherapistService therapistService;
     private final AdminService adminService;
+    private final BookingService bookingService;
+    private final UserService userService;
 
     @GetMapping("/dashboard")
     public String adminDashboard(Model model) {
@@ -70,5 +77,23 @@ public class AdminController {
     public String softDeleteTherapist(@PathVariable UUID id) {
         adminService.softDeleteTherapist(id);
         return "redirect:/admin/dashboard";
+    }
+
+    @GetMapping("/bookings")
+    public String viewAllBookings(
+            @RequestParam(required = false) BookingStatus status,
+            @RequestParam(required = false) UUID therapistId,
+            @RequestParam(required = false) UUID customerId,
+            Model model) {
+
+        List<BookingResponseDto> bookings =
+                bookingService.getAllBookingsFiltered(status, therapistId, customerId);
+
+        model.addAttribute("bookings", bookings);
+        model.addAttribute("statusOptions", BookingStatus.values());
+        model.addAttribute("therapists", therapistService.getAllTherapists());
+        model.addAttribute("customers", userService.getAllCustomers());
+
+        return "admin/bookings";
     }
 }
